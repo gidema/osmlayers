@@ -1,0 +1,260 @@
+<!-- 
+Versie afgeleid van ligfiets: bicycletags on osm
+Marc Zoutendijk
+Toegevoegd Searchbox van Netzwolf.
+Vanaf versie 0.7 staat de code op de server nu in taglocator
+Noordfiets kwam met nieuwe code om het popupvenster wat minder te belasten.
+Herkenbaar aan //=== NIEUW
+
+maandag 22 december 2014:
+B0.08
+Probleem met permalink en de nieuwe querystring is opgelost.
+dinsdag 23 december 2014
+de init functie omgezet in window.onload
+ -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" lang="en"/>
+  <title>Various tags on OSM</title>
+  <script src="api/jquery-1.11.2.min.js" type="text/javascript"></script>
+  <script src="api/OpenLayers.debug.js" type="text/javascript"></script>
+  <script src="api/OpenStreetMap.js" type="text/javascript"></script>
+  <script src="http://maps.google.com/maps/api/js?v=3.2&amp;sensor=false" type="text/javascript"></script>
+  <script src="js_source/FeaturePopup.js"></script>  
+  <script src="js_source/TagLocator.tree.js"></script>  
+  <script src="js_source/noordpass_gji.js" type="text/javascript"></script>
+  <script src="js_source/layerdef_gji.js" type="text/javascript"></script>
+  <script src="js_source/browser.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="css/style.css" type="text/css"></link>
+  <link rel="stylesheet" href="css/mz_style.css" type="text/css"></link>
+  <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico"></link>
+  
+  <script src="js_source/searchbox.js" type="text/javascript"></script>  
+  <script src="js_source/nominatim_translation_nl.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+  BrowserDetect.init();
+  var browser = "";
+  //oplossing voor browserverschillen
+  if (BrowserDetect.browser == "MSIE" && BrowserDetect.version == "10"){
+    browser = "ie10";
+  }
+  if (BrowserDetect.browser == "MSIE" && BrowserDetect.version == "9"){
+    browser = "ie9";
+  }
+  //proxy instelling voor ie9/8
+  var proxy = false;
+    
+  if (BrowserDetect.browser == "MSIE" && BrowserDetect.version < "10"){
+    proxy = true;
+  }
+  if (proxy) {
+    // zet dit terug naar je eigen proxy
+    var QURL = "http://mijndev.openstreetmap.nl/~marczoutendijk/mzfiets/api/interpreter/";
+  }
+  else{
+    var QURL = "http://overpass-api.de/api/interpreter/"; //default
+  }
+  // standaard positie/zoom    
+  var lat = 52.09;
+  var lon = 5.12;
+  var zoom = 13;
+    
+  var map;
+  var tabtype = {
+    name: "amenity",
+    clearall: function (){ //functie voor toekomstig gebruik
+      for (i = map.layers.length - 1; i > 1; i--) { 
+        if (map.layers[i].isBaseLayer == false) { // only to overlays
+          map.layers[i].setVisibility(false);
+        }
+      }
+    },
+    selectall: function (){
+      for (i = map.layers.length - 1; i > 1; i--) { 
+        if (map.layers[i].isBaseLayer == false) { // only to overlays
+          map.layers[i].setVisibility(true);
+        }
+      }
+    }
+  };
+    
+  //==============NIEUW==========================  
+  
+  
+  // Op mijn verzoek heeft Noordfiets dit gemaakt.
+  // Als je nu op de kaart klikt op een markering, dan krijg je alleen maar iets te zien dat je ook hebt opgevraagd.
+  // Dus een straat die langs bv. een opgevraagde winkel liep, werd ook zichtbaar in het popup scherm.
+  // Nu alleen nog maar die winkel.
+  
+  // Noordfiets:
+  // verschillende querystrings per laag
+  // default is de standaard query, en mag niet weggelaten !
+  // de overige zijn naar keuze, als je niks opgeeft wordt het de default query
+  // de Qstring["naam"] moet de naam van een laag zijn
+  
+  // In Qstring worden alle mogelijke queries geplaatst  
+  var Qstring = new Array(); 
+  Qstring["default"] = QURL + "?data=[out:json];(node(bbox);way(bbox););out tags;&redirect=no&template=ids.popup"; 
+  
+  Qstring["amenity"] = QURL + "?data=[out:json];(node(bbox);way(bbox););out tags;&redirect=no&template=ids.popup";
+  
+  Qstring["shop"] = QURL + "?data=[out:json];(node(bbox);way(bbox););out tags;&redirect=no&template=ids.popup";
+  
+  Qstring["tourism"] = QURL + "?data=[out:json];(node(bbox);way(bbox););out tags;&redirect=no&template=ids.popup";
+  
+  Qstring["sport"] = QURL + "?data=[out:json];(node(bbox);way(bbox););out tags;&redirect=no&template=ids.popup";
+  
+  Qstring["food"] = QURL + "?data=[out:json];(node(bbox);way(bbox););out tags;&redirect=no&template=ids.popup";
+  
+  Qstring["various"] = QURL + "?data=[out:json];(node(bbox);way(bbox););out tags;&redirect=no&template=ids.popup";
+
+  var click;  
+  //==============================================
+  //==============================================
+
+
+  //=== NIEUW ====
+  // zoek naar een eventuele map variabele in de GET van de permalink
+  var permalink_true = window.location.search;
+  if (permalink_true.length > 0){
+    q = permalink_true.split("&");
+    n = q[0].split("=");
+    if (n[1].length > 0){
+      tabtype.name = n[1];
+      //alert(tabtype.name); //debug
+    }
+  }
+
+//==================
+  
+//  de openlayers functie
+
+// mz: javascript onload uit body tag verwijderd.
+// nu een onload function
+
+window.onload = function () {
+    taglocator = new Taglocator();
+//    var ls = new OpenLayers.Control.LayerSwitcher();
+//   plink = new OpenLayers.Control.Permalink({base: "?map=" + tabtype.name});
+//    map = new OpenLayers.Map ("map", {
+//    controls:[
+//      ls,
+//      new OpenLayers.Control.Navigation(),
+//      new OpenLayers.Control.PanZoomBar(),
+//      new OpenLayers.Control.MousePosition(), // niet bij BTM
+//      plink,
+//      new OpenLayers.Control.Attribution()],
+//      maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34),
+//      maxResolution: 156543.0399,
+//      numZoomLevels: 19,
+//      units: 'm',
+//      projection: new OpenLayers.Projection("EPSG:900913"),
+//      displayProjection: new OpenLayers.Projection("EPSG:4326"),
+//      theme: null // zie stylesheets
+//    } );
+//    ls.maximizeControl(); 
+//  
+// De Zoekbox
+//    
+//  map.addControl (new OpenLayers.Control.SearchBox({      
+//    autoClose: false,            
+//    defaultLimit: 50,            
+//    minDistance: 50,            
+//    resultMinZoom: 13         // Hiermee stel je in op welk niveau moet worden ingezoomd nadat de zoekterm is gevonden      
+//  }));                  
+    
+// ==== de baselayers ==
+
+//In verband met de leesbaarheid heb ik MapQuest bovenaan gezet. De kleuren van die kaart zijn wat rustiger waardoor de contrasten met de kleuren van de gebruikte tekens wat groter is.
+
+//Mapquest  - De kaart die bovenstaat in deze lijst is de kaart die default wordt geopend.  
+//    var mapquest = new OpenLayers.Layer.OSM("MapQuest","http://otile1.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
+//      {'attribution': '© <a href="http://www.openstreetmap.org/copyright/en" target="_blank">OpenStreetMap</a> Contributors<br>Cartography © MapQuest<br>Overlay data licensed under ODbL '}); 
+//    map.addLayer(mapquest);
+
+//Mapnik
+//    layerMapnik = new OpenLayers.Layer.OSM.Mapnik("Mapnik",{'attribution': '© <a href="http://www.openstreetmap.org/copyright/en" target="_blank">OpenStreetMap</a> Contributors<br>Cartography licensed as CC-BY-SA<br>Overlay data licensed under ODbL '});
+//    map.addLayer(layerMapnik);
+    
+//Topo
+//    var arcgis = new OpenLayers.Layer.XYZ("ArcGIS World Topo","http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/${z}/${y}/${x}",{'attribution': 'Cartography © <a href="http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer" target="_blank">ArcGIS</a><br>Overlay data OpenStreetMap Contributors, licensed under ODbL '}); 
+//    map.addLayer(arcgis);
+
+//Google    
+//    googlesat = new OpenLayers.Layer.Google("Google Sat",{type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 19});
+//    map.addLayer(googlesat);
+
+    // === layers, zoom and position
+//    var lonLat = new OpenLayers.LonLat(lon, lat).transform(new OpenLayers.Projection("EPSG:4326"), new OpenLayers.Projection("EPSG:900913"));
+//    layerdef(tabtype.name); // roept externe layerdefinitie in layerdef.js aan
+//    document.getElementById(tabtype.name).className = "choice";
+//    if(!map.getCenter()) {
+//      map.setCenter(new OpenLayers.LonLat(lon,lat).transform(map.displayProjection,map.projection), zoom);
+//    }  
+    // deze class wordt in noordpass.js gedefinieerd
+    
+    // mz: Dit is de code die zorgt voor het popupscherm als je ergens op de kaart klikt.
+    // 
+    // ============== GEWIJZIGD ======================
+
+    // het klikgebied kun je ruimer instellen door de waarde ervan groter te maken
+    // in kleine stapjes graag, dus bv 0.00015, 0.0002 etc.
+    // klikken op POI's wordt dan makkelijker
+    // maar als je bv relations opvraagt worden ook die in een ruimer gebied gezocht
+//      if (Qstring[tabtype.name] !== undefined){ 
+//        var myquery = Qstring[tabtype.name];
+//        }
+//      else{
+//        var myquery = Qstring["default"];
+//        }
+//
+//      click = new OpenLayers.Control.Click(
+//        myquery,
+//        0.01, // klikgebied
+//        map); 
+//      map.addControl(click);
+//      click.activate();
+
+    // =================================================
+    // =================================================
+    }    
+  </script>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-38609407-2', 'auto');
+  ga('send', 'pageview');
+</script>  
+</head>
+
+<body>
+<iframe height=0 width=0 name="josm_frame" class="hidden"></iframe> 
+<div id="map" class="smallmap">
+</div>
+<div id="titel" class="titel">
+  <table width="100%" border="0" cellspacing="0" cellpadding="6" height="100%">
+    <tr>
+      <td colspan="4" class="kaartnaam" style="border-bottom:1px solid #000000;" align="center">Various tags on OSM <a href='help/taghelp.html' target='_blank'><img src='img/help.gif'></a> [Bèta 0.08a++]</td>
+    </tr>
+    <tr>
+      <td id="amenity" class="dorment" style="border-right:1px solid #000000;border-bottom:1px solid #000000;" onclick="switchtab(this.id,tabtype.name);"align="center">Amenity</td>
+      <td id="tourism" class="dorment" style="border-right:1px solid #000000;border-bottom:1px solid #000000;" onclick="switchtab(this.id,tabtype.name);"align="center">Tourism</td>
+      <td id="sport" class="dorment" style="border-right:1px solid #000000;border-bottom:1px solid #000000;" onclick="switchtab(this.id,tabtype.name);"align="center">Sport</td>
+      <td id="shop" class="dorment" style="border-bottom:1px solid #000000;" onclick="switchtab(this.id,tabtype.name);"align="center">Shop</td>
+    </tr>
+    <tr>
+      <td id="food" class="dorment" style="border-right:1px solid #000000;" onclick="switchtab(this.id,tabtype.name);"align="center">Food</td>
+      <td id="various" class="dorment" style="border-right:1px solid #000000;" onclick="switchtab(this.id,tabtype.name);"align="center">Various</td>
+      <td id="clearall" class="action" style="border-right:1px solid #000000;" onclick="tabtype.clearall();" align="center">clear all</td>
+      <td id="select" class="action" style="border-right:1px solid #000000;" onclick="tabtype.selectall();" align="center">set all</td>
+    </tr>
+  </table>
+</div>
+<div id="statusline" class="statusline">
+</div>
+</body>
+</html>
