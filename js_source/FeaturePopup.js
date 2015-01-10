@@ -23,16 +23,10 @@ FeaturePopup = OpenLayers.Class({
     popup.panMapIfOutOfView = true;
     popup.opacity = 1.0;
     popup.setBorder("2px solid"); //mz: Border aan de buitenkant 
-    if (browser == "ie9") {
-      var marge =  new OpenLayers.Bounds(0, 0, 0, 0);
-    }
-    else {
-      var marge =  new OpenLayers.Bounds(4, 4, 4, 4); 
-    }
-    popup.padding = marge;
-    var links = popuplinks(lonlat.clone().transform("EPSG:900913", "EPSG:4326"));
+    popup.padding = new OpenLayers.Bounds(4, 4, 4, 4);
+//    var links = popuplinks(lonlat.clone().transform("EPSG:900913", "EPSG:4326"));
     //alert(link); //debug
-    popup.contentHTML = html + "<br><img src='img/zuurstok.gif'>";
+    popup.contentHTML = "<br><img src='img/zuurstok.gif'>";
     this.map.addPopup(popup, true);
 //    var rel_tolerance = this.tolerance * this.map.getScale();
 //    if (rel_tolerance > 0.00008) rel_tolerance = 0.00008;
@@ -40,23 +34,16 @@ FeaturePopup = OpenLayers.Class({
     var oURL = this.genericUrl + "?data=[out:json];" + event.feature.fid.replace(".", "(") + ");out;";
     var html = "";
     var self = this;
-    var json = $.get(oURL, [], function(data) {
+    $.get(oURL, [], function(data) {
       html = self.processFeatures(data.elements);
     }, "json")
     .done(function() {
-      popup.contentHTML = links + html;
+      popup.contentHTML = html;
       popup.draw();
     })
     .fail(function() {
       popup.contentHTML = links + "Could not read overpass data;";
     });
-  //  }
-  //  else {
-  //    html = html + "<span style=\"font-size: 8pt; color: red;\">" + "(Zoom in for tag info) </span>";
-  //    this.map.removePopup(popup);
-  //    popup.contentHTML = html;
-  //    this.map.addPopup(popup);
-  //  }
   },
    
   /* 
