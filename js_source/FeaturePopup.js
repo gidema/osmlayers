@@ -26,6 +26,7 @@ FeaturePopup = OpenLayers.Class({
     popup.padding = new OpenLayers.Bounds(4, 4, 4, 4);
 //    var links = popuplinks(lonlat.clone().transform("EPSG:900913", "EPSG:4326"));
     //alert(link); //debug
+//      popup.contentHTML = this.processFeatures(event.feature);
     popup.contentHTML = "<br><img src='img/zuurstok.gif'>";
     this.map.addPopup(popup, true);
 //    var rel_tolerance = this.tolerance * this.map.getScale();

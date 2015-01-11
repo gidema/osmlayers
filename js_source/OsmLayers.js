@@ -13,6 +13,7 @@ var OsmLayers = OpenLayers.Class( {
   osmLayers: [],
   map : null,
   currentLayerGroup : null,
+  hoverPopup : null,
   featurePopup : null,
 
   // Constructor  
@@ -61,6 +62,12 @@ var OsmLayers = OpenLayers.Class( {
       eventListeners: {
         featureclick: function(e) {
           self.featurePopup.click(e);
+        },
+        featureover: function(e) {
+          self.featureover(e);
+        },
+        featureout: function(e) {
+          self.featureout(e);
         }
       }
     } );
@@ -151,6 +158,29 @@ var OsmLayers = OpenLayers.Class( {
   zoomValid: function() {
     return this.map.getZoom() > this.zoom_data_limit;
   },
+  
+  featureover: function(event) {
+    if (event.feature.attributes.name) {
+      var name = event.feature.attributes.name;
+      this.hoverPopup = new OpenLayers.Popup.FramedCloud("pop",
+        event.feature.geometry.getBounds().getCenterLonLat(),
+        null,
+        '<div class="markerContent">'+name+'</div>',
+        null,
+        true,
+        function() { controls['selector'].unselectAll(); }
+      );
+      this.map.addPopup(this.hoverPopup);
+    }
+  },
+
+  featureout: function(event) {
+    if (this.hoverPopup) {
+      this.hoverPopup.destroy();
+      this.hoverPopup = null;
+    }
+  },
+
   /*
    * Create an OSM Vector layer for a feature using the supplied layerDef
    */
