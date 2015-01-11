@@ -217,3 +217,12 @@
       margin-top: 6px;
     }
 
+#osmlLayerTree {
+	width: 200px;
+	left: 0px;
+	top: 0px;
+}
+
+#osmlMap {
+	left: 200px;
+}
