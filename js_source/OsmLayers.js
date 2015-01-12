@@ -162,13 +162,12 @@ var OsmLayers = OpenLayers.Class( {
   featureover: function(event) {
     if (event.feature.attributes.name) {
       var name = event.feature.attributes.name;
-      this.hoverPopup = new OpenLayers.Popup.FramedCloud("pop",
+      this.hoverPopup = new OpenLayers.Popup.Anchored("pop",
         event.feature.geometry.getBounds().getCenterLonLat(),
-        null,
+        new OpenLayers.Size(150, 15),
         '<div class="markerContent">'+name+'</div>',
         null,
-        true,
-        function() { controls['selector'].unselectAll(); }
+        false
       );
       this.map.addPopup(this.hoverPopup);
     }
