@@ -24,38 +24,28 @@ FeaturePopup = OpenLayers.Class({
     popup.opacity = 1.0;
     popup.setBorder("2px solid"); //mz: Border aan de buitenkant 
     popup.padding = new OpenLayers.Bounds(4, 4, 4, 4);
-//    var links = popuplinks(lonlat.clone().transform("EPSG:900913", "EPSG:4326"));
-    //alert(link); //debug
-    popup.contentHTML = "<br><img src='img/zuurstok.gif'>";
+    popup.contentHTML = this.processFeature(event.feature);
     this.map.addPopup(popup, true);
-//    var rel_tolerance = this.tolerance * this.map.getScale();
-//    if (rel_tolerance > 0.00008) rel_tolerance = 0.00008;
-  
-    var oURL = this.genericUrl + "?data=[out:json];" + event.feature.fid.replace(".", "(") + ");out;";
-    var html = "";
-    var self = this;
-    $.get(oURL, [], function(data) {
-      html = self.processFeatures(data.elements);
-    }, "json")
-    .done(function() {
-      popup.contentHTML = html;
-      popup.draw();
-    })
-    .fail(function() {
-      popup.contentHTML = links + "Could not read overpass data;";
-    });
   },
    
+  /*
+   * Create the div element for a single feature
+   */
+  processFeature: function(feature) {
+    var fid = feature.fid.split(".");
+    return this.processElement(fid[0], fid[1], feature.attributes);
+  },
+
   /* 
    * Create the div element containing the information about the selected features
    * Handling multiple features is supported.
    */
-  processFeatures : function(elements) {
+  processElements : function(elements) {
     var html = '<div class="pois">\n';
     var self = this;
     jQuery.each( elements, function( index, value ) {
       if (value.tags) {
-         html += self.processFeature(value.type, value.id, value.tags);
+         html += self.processElement(value.type, value.id, value.tags);
       }
     });
     html += "</div>\n";
@@ -65,7 +55,7 @@ FeaturePopup = OpenLayers.Class({
   /*
    * Create the div element for a single feature
    */
-  processFeature : function(type, id, tags) {
+  processElement : function(type, id, tags) {
     var html = '<div class="poi">\n';
     var name = tags.name;
     if (name) {
