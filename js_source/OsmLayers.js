@@ -6,13 +6,13 @@ $(document).ready(function () {
 var OsmLayers = OpenLayers.Class( {
   baseUrl : "http://overpass-api.de/api/interpreter/",
   zoom_data_limit : 12,
-  ls : new OpenLayers.Control.LayerSwitcher(),
+  ls : null,
   plink : new OpenLayers.Control.Permalink({base: "?map="}),
   layers : {},
   layerGroups : {},
   osmLayers: [],
   map : null,
-  currentLayerGroup : null,
+//  currentLayerGroup : null,
   hoverPopup : null,
   featurePopup : null,
 
@@ -25,20 +25,24 @@ var OsmLayers = OpenLayers.Class( {
   },
   
   // Add a new layer
-  addLayer : function(filter, color, name) {
-    var layerDef = new LayerDef(name, filter, color);
+  addLayer : function(id, name, query, marker) {
+    var layerDef = new LayerDef(id, name, query, marker);
     var layer = this.makeLayer(layerDef);
-    this.layers[name] = layer;
+    this.layers[id] = layer;
   },
   
   // GetLayer
-  getLayer: function(name) {
-    return this.layers[name];
+  getLayer: function(id) {
+    return this.layers[id];
   },
   // Add a new layer group
-  addLayerGroup : function(name, layers) {
-    var group = new LayerGroup(this, name, layers);
-    this.layerGroups[name] = group;
+  addLayerGroup : function(id, name, layers) {
+    var group = new LayerGroup(this, id, name, layers);
+    this.layerGroups[id] = group;
+  },
+  // GetLayer
+  getGroup: function(id) {
+    return this.layerGroups[id];
   },
   /*
    * Initialize the OpenLayers map
@@ -47,7 +51,6 @@ var OsmLayers = OpenLayers.Class( {
     var self = this;
     this.map = new OpenLayers.Map ("map", {
       controls:[
-        this.ls,
         new OpenLayers.Control.Navigation(),
         new OpenLayers.Control.PanZoomBar(),
         this.plink,
@@ -56,6 +59,7 @@ var OsmLayers = OpenLayers.Class( {
       maxResolution: 156543.0399,
       numZoomLevels: 19,
       units: 'm',
+      size: new OpenLayers.Size(500, 500),
       projection: new OpenLayers.Projection("EPSG:900913"),
       displayProjection: new OpenLayers.Projection("EPSG:4326"),
       theme: null, // zie stylesheet
@@ -63,19 +67,26 @@ var OsmLayers = OpenLayers.Class( {
         featureclick: function(e) {
           self.featurePopup.click(e);
         },
-        featureover: function(e) {
-          self.featureover(e);
-        },
-        featureout: function(e) {
-          self.featureout(e);
-        }
+//        featureover: function(e) {
+//          self.featureover(e);
+//        },
+//        featureout: function(e) {
+//          self.featureout(e);
+//        }
       }
     } );
     var map = this.map;
-    this.ls.maximizeControl(); 
+    // The layer switcher
+    this.ls = new OsmLayers.LayerTreeSwitcher({
+      div: document.getElementById("osmlLayerSelector"),
+      layerGroups: this.layerGroups
+    });
+    //this.ls.maximizeControl();
+    map.addControl(this.ls);
     
     // De Zoekbox
-    map.addControl (new OpenLayers.Control.SearchBox({      
+    map.addControl (new OpenLayers.Control.SearchBox({
+      div: document.getElementById("osmlSearchBox"),
       autoClose: false,            
       defaultLimit: 50,            
       minDistance: 50,            
@@ -97,61 +108,15 @@ var OsmLayers = OpenLayers.Class( {
   /*
    * Initialize the OSM layers
    */
-  initOsmLayers : function(groupName) {
-    var layerGroup = this.layerGroups[groupName];
-    if (layerGroup) {
-      var map = this.map;
-      $.each(layerGroup.layers, function (index, layer) {
+  initOsmLayers : function() {
+    var map = this.map;
+    $.each(this.layerGroups, function(name, group) {
+      $.each(group.layers, function (index, layer) {
         map.addLayer(layer);
       });
-      this.currentLayerGroup = layerGroup;
-      document.getElementById(groupName).className = "choice";
-    }
-  },
-  
-  /*
-   * Change the layer group
-   */
-  changeGroup : function(newtab) { 
-    // this removes all layers that are not base layers 
-    // and construct a list of visible layers in the current view
-    var activetab = this.currentLayerGroup.name;
-    var layers = this.map.layers;
-    while (layers[layers.length -1].isBaseLayer == false) {
-      layers.pop();
-    }
-    // add the layers for the new tab group
-
-    this.initOsmLayers(newtab);
-    // redraw the layer selector
-    this.ls.redraw();
-
-    //update layout and global vars and permalink
-    document.getElementById(activetab).className = "dorment";
-    document.getElementById(newtab).className = "choice";
-    this.plink.base = "?" + "map=" +  newtab;
-    this.plink.updateLink();
-  },
-  
-  /*
-   * Unselect all layers
-   */
-  clearall: function () { //functie voor toekomstig gebruik
-    this.osmLayers.forEach(function(layer) {
-      layer.setVisibility(false);
     });
   },
-  
-  /*
-   * Select all layers for the current layerGroup
-   */
-  selectall: function() {
-//    for (i = map.layers.length - 1; i > 1; i--) { 
-//      if (map.layers[i].isBaseLayer == false) { // only to overlays
-//        map.layers[i].setVisibility(true);
-//      }
-//    }
-  },
+
   /*
    * Check if the zoom level is valid for downloading data
    */
@@ -184,74 +149,36 @@ var OsmLayers = OpenLayers.Class( {
    * Create an OSM Vector layer for a feature using the supplied layerDef
    */
   makeLayer : function(layerDef) {
-    var data_url = this.baseUrl + "?data=" + layerDef.filter;
-    var color = layerDef.color;
-    var size = 2.7;
-    var visible = false;
-    var dash;
-    var opacity;
-    var radopacity;
-
-    // ----- opacity catch in dash, if dash = "4 3@1.0" 1.0 is used as opacity
-    if (dash != undefined) {
-      var dashalfa = dash.split("@");
-      dash = dashalfa[0];
-      if (dashalfa[1] == undefined) {
-        opacity = 0.75;
-      }
-      else {
-        opacity = parseFloat(dashalfa[1]);
-      }
-    }
-    else {
-      dash = "solid";
-      opacity = 0.75;
-    }
-    //calculate seperate radius if given  
-    var radius = (size - Math.floor(size)) * 10;
-    if (radius <= 0) {
-      radius = size;
-      radopacity = 0.0;
-    }
-    else {
-      radopacity = opacity;
-    } 
-    var html = layerDef.getNameHtml();
-    //---- add an image if specified by  placehoder in name, placeholders are #l# > single line, #dl#>line line,#d#>dotted 
-    //  alert(name);
-    //    name = name.replace("#l#", "<img style='vertical-align: middle;background-color: " + color + ";' src='img/line.gif'>&nbsp");
-    //    name = name.replace("#dl#", "<img style='vertical-align: middle;background-color: " + color + ";' src='img/lineline.gif'>&nbsp");
-    //    name = name.replace("#d#", "<img style='vertical-align: middle;background-color: " + color + ";' src='img/dots.gif'>&nbsp");
-    //    name = name.replace("#c#", "<img style='vertical-align: middle;background-color: " + color + ";' src='img/tcircle-geel.gif'>&nbsp");
-    //zoomlevel
-    return this.make_large_layer(data_url, color, html, 13, size, visible, dash, opacity, radius, radopacity);
-  },
-
-  make_large_layer : function make_large_layer(data_url, color, name, zoom, size,
-    visible, dash, opacity, radius, radopacity) {
-  
     var styleMap =  new OpenLayers.StyleMap( {
-      strokeColor : color, 
-      strokeOpacity : opacity,
-      strokeWidth : size,
-      strokeLinecap : "square", 
-      strokeDashstyle : dash,
-      pointRadius : radius,
-      fillColor : "white",
-      fillOpacity : radopacity
+      externalGraphic: '../img/markers/' + layerDef.marker,
+      graphicWidth: 20, graphicHeight: 24, graphicYOffset: -24,
+      class: name
+//      strokeColor : color, 
+//      strokeOpacity : opacity,
+//      strokeWidth : size,
+//      strokeLinecap : "square", 
+//      strokeDashstyle : dash,
+//      pointRadius : radius,
+//      fillColor : "white",
+//      fillOpacity : radopacity
     });
-    var layer =  new OpenLayers.Layer.Vector(name, {
+    var layer =  new OpenLayers.Layer.Vector(layerDef.name, {
       strategies : [new ZoomLimitedBBOXStrategy(12)],
       protocol :  new OpenLayers.Protocol.HTTP( {
-        url : data_url,
+        url : this.baseUrl + "?data=" + layerDef.filter,
         format :  new OpenLayers.Format.OSM( {
           checkTags : true,
-          areaTags : ["area", "building", "amenity"]
+//          areaTags : ["area", "building", "amenity", "leisure"]
+          areaTags : []
         })
       }),
       styleMap : styleMap,
-      visibility : visible,
-      projection :  new OpenLayers.Projection("EPSG:4326")
+      visibility : false,
+      projection :  new OpenLayers.Projection("EPSG:4326"),
+      cssClass : layerDef.id
+    });
+    layer.events.register("loadstart", layer, function() {
+      osmLayers.setStatusText('<img src="img/zuurstok.gif"></img>');
     });
     layer.events.register("loadend", layer, function() {
       osmLayers.setStatusText("");
@@ -328,7 +255,6 @@ var ZoomLimitedBBOXStrategy = OpenLayers.Class(OpenLayers.Strategy.BBOX, {
       else if (mapBounds !== null  && ((options && options.force) || this.invalidBounds(mapBounds))) {
         if (this.layer.visibility == true) {
         //  ++load_counter;
-          osmLayers.setStatusText("<img src='img/zuurstok.gif'>");
           this.calculateBounds(mapBounds);
           this.resolution = this.layer.map.getResolution();
           this.triggerRead(options);
@@ -341,59 +267,49 @@ var ZoomLimitedBBOXStrategy = OpenLayers.Class(OpenLayers.Strategy.BBOX, {
 );
 
 var LayerDef = OpenLayers.Class ({
+  id: null,
   name: null,
   filter: null,
-  color: null,
+  marker: null,
   
-  initialize: function LayerDef(name, filter, color) {
-    this.filter = filter;
-    this.color = color;
+  initialize: function LayerDef(id, name, query, marker) {
+    this.id = id;
     this.name = name;
-    this.filter = this.createFilter(filter);
+    this.query = query;
+    this.filter = this.createFilter(query);
+    this.marker = marker;
   },
   
-  createFilter : function(filter) {
+  createFilter : function(query) {
     var f = "(";
-    if ($.isArray(filter)) {
-      $.each(filter, function(index, value) {
+    var parts = query.split(",");
+    if (parts.length > 1) {
+      $.each(parts, function(index, value) {
         f += "node" + value + "(bbox);way" + value + "(bbox);rel" + value + "(bbox);";
       });
-      return f + ");(._;>;);out;";
+      return f + ");(._;>;);out center;";
     }
-    return "(node[" + filter + "](bbox);way[" + filter + "](bbox);rel[" + filter + "](bbox););(._;>;);out;";
-  },
+    return "(node[" + query + "](bbox);way[" + query + "](bbox);rel[" + query + "](bbox););(._;>;);out center;";
+  }
   
-  getNameHtml : function() {
-//    if (this.type == undefined) {
-//      return this.getName;
-//    }
-//    switch (this.type) {
-//      case "line":
-//        return '<img style="vertical-align: middle;background-color: ' + this.color + ';" src="img/line.gif">&nbsp;' + this.name;
-//      case "lineline":
-//        return '<img style="vertical-align: middle;background-color: ' + this.color + ';" src="img/lineline.gif">&nbsp;' + this.name;
-//      case "dots":
-//        return '<img style="vertical-align: middle;background-color: ' + this.color + ';" src="img/dots.gif">&nbsp;' + this.name;
-//      case "circle":
-        return '<img style="vertical-align: middle;background-color: ' + this.color + ';" src="img/tcircle-geel.gif">&nbsp;' + this.name;
-//     } 
-  } 
 });
 
 var LayerGroup = OpenLayers.Class ({
+  id: null,
   name: null,
   layers: null,
   
-  initialize: function(tl, name, layerNames) {
+  initialize: function(osml, id, name, layerIds) {
+    this.id = id;
     this.name = name;
     this.layers = [];
-    layerNames.forEach(function(name) {
-        var layer = tl.getLayer(name);
+    layerIds.forEach(function(id) {
+        var layer = osml.getLayer(id);
         if (layer) {
           this.layers.push(layer);
         }
         else {
-          throw "Unknown layer: " + name;
+          alert("Unknown layer: " + id);
         }
     }, this);
   }

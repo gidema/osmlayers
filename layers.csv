@@ -1,0 +1,95 @@
+name,id,query,marker
+Bench,osmBench,amenity=bench,letter_b.png
+Post box,osmPostbox,amenity=post_box,letter_p.png
+Post office,osmPostoffice,amenity=post_office,postal.png
+Pharmacy,osmPharmacy,amenity=pharmacy,medicalstore.png
+Toilets,osmToilets,amenity=toilets,toilets.png
+Police,osmPolice,amenity=police,police.png
+ATM,osmATM,"[amenity=atm],[amenity=bank][atm][atm!=no]",atm-2.png
+Fuel,osmFuel,amenity=fuel,fillingstation.png
+School/College,osmSchool,"[amenity=school],[amenity=college]",school.png
+University,osmUniversity,amenity=university,university.png
+Bicycle parking,osmBicycleparking,amenity=bicycle_parking,parking_bicycle-2.png
+Bicycle rental,osmBicyclerental,amenity=bicycle_rental,number_1.png
+Taxi,osmTaxi,amenity=taxi,taxi.png
+Parking,osmParking,amenity=parking,parkinggarage.png
+Arts centre,osmArtscentre,amenity=arts_centre,artgallery.png
+Theatre,osmTheatre,amenity=theatre,theater.png
+Cinema,osmCinema,amenity=cinema,cinema.png
+Information,osmInformation,tourism=information,information.png
+Museum,osmMuseum,tourism=museum,museum_art.png
+Artwork,osmArtwork,tourism=artwork,number_2.png
+Gallery,osmGallery,tourism=gallery,artgallery.png
+Picnic,osmPicnic,tourism=picnic_site,picnic-2.png
+Zoo,osmZoo,tourism=zoo,zoo.png
+Viewpoint,osmViewpoint,tourism=viewpoint,sight-2.png
+Attraction,osmAttraction,tourism=attraction,letter_a.png
+Hotel,osmHotel,tourism=hotel,hotel_0star.png
+Apartment,osmApartment,tourism=apartment,apartment-3.png
+Guest house,osmGuesthouse,tourism=guest_house,bed_breakfast1-2.png
+Hostel,osmHostel,tourism=hostel,hostel_0star.png
+Motel,osmMotel,tourism=motel,motel-2.png
+Camp site,osmCampsite,tourism=camp_site,camping-2.png
+Soccer,osmSoccer,sport=soccer,soccer.png
+American football,osmUsFootball,sport=american_football,usfootball.png
+Golf,osmGolf,leisure=golf_course,golfing.png
+Tennis,osmTennis,sport=tennis,tennis.png
+Volleybal,osmVolleybal,sport=volleybal,volleyball.png
+Baseball,osmBaseball,sport=baseball,baseball.png
+Basketball,osmBasketball,sport=basketball,basketball.png
+Ice hockey,osmIcehockey,"[sport=ice_hockey],[leisure=ice_rink]",icehockey.png
+Hockey,osmHockey,"[sport=hockey],[sport=field_hockey]",hockey.png
+Cycling,osmCycling,sport=cycling,cycling.png
+Horse racing,osmHorseracing,"[sport=horse_racing],[sport=equestrian]",horseriding.png
+Swimming,osmSwimming,sport=swimming,swimming.png
+Surfing,osmSurfing,sport=surfing,surfing.png
+Gymnastics,osmGymnastics,sport=gymnastics,indoor-arena.png
+Mall/Shopping centre,osmMall,shop=mall,mall.png
+General,osmShop,shop=general,letter_s.png
+Department store,osmDepartmentstore,shop=department_store,departmentstore.png
+Clothes,osmClothes,shop=clothes,clothers_male.png
+Fashion,osmFashion,shop=fashion,clothers_female.png
+Jewelry,osmJewelry,shop=jewelry,jewelry.png
+Leather,osmLeather,shop=leather,bags.png
+Shoes,osmShoes,shop=shoes,shoes.png
+Hairdresser,osmHairdresser,shop=hairdresser,barber.png
+Beauty,osmBeauty,shop=beauty,beautysalon.png
+Cosmetics,osmCosmetics,shop=cosmetics,perfumery.png
+Chemist,osmChemist,shop=chemist,chemistry-2.png
+Opticien,osmOpticien,shop=optician,ophthalmologist.png
+Books/Stationary,osmBooks,"[shop=books],[shop=stationery]",library.png
+Photo,osmPhoto,shop=photo,photography.png
+Toys,osmToys,shop=toys,toys.png
+Gift,osmGift,shop=gift,gifts.png
+Bicycle,osmBicycle,shop=bicycle,bicycle_shop.png
+Musical instruments,osmMusicalinstruments,shop=musical_instrument,music.png
+Restaurant,osmRestaurant,amenity=restaurant,restaurant.png
+Bar,osmBar,amenity=bar,bar.png
+Cafe,osmCafe,amenity=cafe,cafetaria.png
+Pub,osmPub,amenity=pub,bar.png
+Ice cream,osmIcecream,amenity=ice_cream,icecream.png
+Fast food,osmFastfood,amenity=fast_food,fastfood.png
+Supermarket,osmSupermarket,shop=supermarket,supermarket.png
+Bakery,osmBakery,shop=bakery,bread.png
+Chocolate/Confectionery,osmConfectionery,"[shop=chocolate],[shop=confectionery]",candy.png
+Deli,osmDeli,shop=deli,patisserie.png
+Dairy,osmDairy,shop=dairy,milk_and_cookies.png
+Cheese,osmCheese,shop=cheese,cheese.png
+Greengrocer,osmGreengrocer,shop=greengrocer,fruits.png
+Grocery,osmGrocery,shop=grocery,grocery.png
+Butcher,osmButcher,shop=butcher,butcher-2.png
+Coffee,osmCoffee,shop=coffee,coffee.png
+Seafood,osmSeafood,shop=seafood,restaurant_fish.png
+Organic,osmOrganic,shop=organic,restaurant_vegetarian.png
+Drinking water,osmDrinkingwater,amenity=drinking_water,drinkingwater.png
+Alcohol,osmAlcohol,shop=alcohol,liquor.png
+Wine,osmWine,shop=wine,winebar.png
+Beverages,osmBeverages,shop=beverages,bar_coktail.png
+Travel agency,osmTravelagency,shop=travel_agency,travel_agency.png
+Copy shop,osmCopyshop,shop=copyshop,printer-2.png
+Defibrilator/AED,osmDefibrilator,emergency=defibrillator,aed-2.png
+Fire hose/extinguisher,osmFirehose,emergency=fire_extinguisher,fireexstinguisher.png
+Memorial,osmMemorial,historic=memorial,memorial.png
+Monument,osmMonument,historic=monument,monument.png
+Windmill,osmWindmill,man_made=windmill,windmill-2.png
+Water,osmWatermill,man_made=watermill,watermill-2.png
