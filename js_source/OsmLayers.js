@@ -87,10 +87,10 @@ var OsmLayers = OpenLayers.Class( {
     // De Zoekbox
     map.addControl (new OpenLayers.Control.SearchBox({
       div: document.getElementById("osmlSearchBox"),
-      autoClose: false,            
-      defaultLimit: 50,            
-      minDistance: 50,            
-      resultMinZoom: 13         // Hiermee stel je in op welk niveau moet worden ingezoomd nadat de zoekterm is gevonden      
+      autoClose: false,
+      defaultLimit: 50,
+      minDistance: 50,
+      resultMinZoom: 13 // Hiermee stel je in op welk niveau moet worden ingezoomd nadat de zoekterm is gevonden      
     }));
 
     // The base layers
@@ -150,9 +150,10 @@ var OsmLayers = OpenLayers.Class( {
    */
   makeLayer : function(layerDef) {
     var styleMap =  new OpenLayers.StyleMap( {
-      externalGraphic: '../img/markers/' + layerDef.marker,
+      externalGraphic: 'img/markers/' + layerDef.marker,
       graphicWidth: 20, graphicHeight: 24, graphicYOffset: -24,
-      class: name
+      class: name,
+      fillColor: "#888888"
 //      strokeColor : color, 
 //      strokeOpacity : opacity,
 //      strokeWidth : size,
@@ -166,10 +167,10 @@ var OsmLayers = OpenLayers.Class( {
       strategies : [new ZoomLimitedBBOXStrategy(12)],
       protocol :  new OpenLayers.Protocol.HTTP( {
         url : this.baseUrl + "?data=" + layerDef.filter,
-        format :  new OpenLayers.Format.OSM( {
+        format :  new OpenLayers.Format.OSMExtended( {
           checkTags : true,
-//          areaTags : ["area", "building", "amenity", "leisure"]
-          areaTags : []
+          areaTags : ["area", "building", "amenity", "leisure"]
+//          areaTags : []
         })
       }),
       styleMap : styleMap,
