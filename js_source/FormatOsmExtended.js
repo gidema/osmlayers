@@ -547,5 +547,5 @@ OpenLayers.Format.OSMExtended = OpenLayers.Class(OpenLayers.Format.XML, {
         }    
     },
 
-    CLASS_NAME: "OpenLayers.Format.OSM" 
+    CLASS_NAME: "OpenLayers.Format.OSMExtended" 
 });     
