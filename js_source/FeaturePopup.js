@@ -82,32 +82,38 @@ FeaturePopup = OpenLayers.Class({
    * Create the html for a single tag
    */
   processTag : function(key, value, address) {
-    switch (key) {
+    var k = key.split(":");
+    switch (k[0]) {
     case "website":
-    case "url":
-    case "contact:website":
-      if (value.indexOf(":") == -1) {
-        return this.makeLink("//" + value, value, true);
-      }
-      return this.makeLink(value, value, true);
-    case "wikipedia":
-      var parts = value.split(':');
-      if (parts.length = 2) {
-        var href = "http://" + parts[0] + ".wikipedia.org/wiki/" + parts[1];
-        return this.makeLink(href, value, true);
-      }
-      return value; 
     case "twitter":
-      return this.makeLink("https://twitter.com/" + value, value, true);
     case "facebook":
-      if (value.startsWith("http") || value.startsWith("www") || value.startsWith("facebook")) {
-        return this.makeLink(value, value, true);
-      }
-      return this.makeLink("https://www.facebook.com/" + value, value, true);
     case "email":
-      return this.makeLink("mailto:" + value, value, true);
     case "phone":
-      return this.makeLink("tel:" + value, value, true);
+    case "fax":
+    case "url": 
+      return this.processContactTag(k[0], value);
+    case "contact":
+      if (k.length > 1) {
+        return this.processContactTag(k[1]);
+      }
+      return key;
+    case "wikipedia":
+      if (k.length == 2) {
+        var lang = k[1] + ".";
+      }
+      else {
+        lang = "";
+      }
+      var s = value.split(':'); //Subject
+      if (s.length == 2) {
+        lang = s[0] + ".";
+        subject = s[1];
+      }
+      else {
+        subject = value;
+      }
+      var href = "http://" + lang + "wikipedia.org/wiki/" + subject;
+      return this.makeLink(href, value, true);
     case "addr:street":
     case "addr:housenumber":
     case "addr:postcode":
@@ -120,6 +126,30 @@ FeaturePopup = OpenLayers.Class({
       return value;
     }
   },
+  
+  processContactTag : function(key, value) {
+    switch (key) {
+    case "website":
+    case "url":
+      return this.makeLink(value, value, true);
+    case "twitter":
+      return this.makeLink("https://twitter.com/" + value, value, true);
+    case "facebook":
+      if (value.startsWith("http") || value.startsWith("www") || value.startsWith("facebook")) {
+        return this.makeLink(value, value, true);
+      }
+      return this.makeLink("https://www.facebook.com/" + value, value, true);
+    case "email":
+      return this.makeLink("mailto:" + value, value, true);
+    case "phone":
+      return this.makeLink("tel:" + value, value, true);
+    case "fax":
+      return this.makeLink("fax:" + value, value, true);
+    default:
+      return value;
+    }
+  },
+
   /*
    * Create the html for a nicely formatted address.
    */
@@ -143,8 +173,9 @@ FeaturePopup = OpenLayers.Class({
   makeLink : function(href, text, newPage) {
     var html = "<a ";
     if (newPage) html += 'target="_blank" ';
-    html += 'href="' + href + '">' + text + "</a>";
-    return html;
-  },
+    if (href.indexOf(":") == -1) {
+      return html + 'href=//"' + href + '">' + text + "</a>";
+    }
+    return html + 'href="' + href + '">' + text + "</a>";  },
   CLASS_NAME : "FeaturePopup"
 });
