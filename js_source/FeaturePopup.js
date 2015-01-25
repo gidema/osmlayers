@@ -16,14 +16,11 @@ FeaturePopup = OpenLayers.Class({
   click : function(event) {
     var lonlat = event.feature.geometry.getBounds().getCenterLonLat();
     var popup =  new OpenLayers.Popup("location_info", lonlat, null, "", true );
-    popup.setBackgroundColor("#fefdd5"); // achtergrondkleur van het popup venster
     popup.closeOnMove = false;
     popup.autoSize = true;
     popup.maxSize =  new OpenLayers.Size(250, 300);
     popup.panMapIfOutOfView = true;
-    popup.opacity = 1.0;
-    popup.setBorder("2px solid"); //mz: Border aan de buitenkant 
-    popup.padding = new OpenLayers.Bounds(4, 4, 4, 4);
+    popup.opacity = null;
     popup.contentHTML = this.processFeature(event.feature);
     this.map.addPopup(popup, true);
   },
@@ -114,10 +111,7 @@ FeaturePopup = OpenLayers.Class({
       }
       var href = "http://" + lang + "wikipedia.org/wiki/" + subject;
       return this.makeLink(href, value, true);
-    case "addr:street":
-    case "addr:housenumber":
-    case "addr:postcode":
-    case "addr:city":
+    case "addr":
       return (address ? null : value);
     case "name":
       // Ignore the name tag because we show it in the header
@@ -176,6 +170,7 @@ FeaturePopup = OpenLayers.Class({
     if (href.indexOf(":") == -1) {
       return html + 'href=//"' + href + '">' + text + "</a>";
     }
-    return html + 'href="' + href + '">' + text + "</a>";  },
+    return html + 'href="' + href + '">' + text + "</a>";
+  },
   CLASS_NAME : "FeaturePopup"
 });

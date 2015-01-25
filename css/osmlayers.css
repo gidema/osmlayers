@@ -175,6 +175,13 @@ div.info {
 }
 
 /* Hieronder is de style voor het popupvenster. */
+
+.olPopup {
+  border: 1px solid #000080 !important;
+  background-color: #ffffef !important;
+  opacity: 0.9 !important;
+}
+
 .olPopupContent {
   font-size: 80%;
   font-family: Verdana;
@@ -183,7 +190,6 @@ div.info {
     border-width: 1px;
     border-style: solid;
  */
-  background-color: #fefdd5;
   margin: 2px;
   padding: 5px;
 }
@@ -248,11 +254,7 @@ div.pois {
   font-size: 80%;
 }
 
-div.pois h3 {
-  margin-bottom: 0px;
-}
-
-div.poi {
-  margin-top: 6px;
+div.poi h3 {
+  margin: 0.2em 0;
 }
 
