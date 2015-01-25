@@ -85,6 +85,10 @@ FeaturePopup = OpenLayers.Class({
     switch (key) {
     case "website":
     case "url":
+    case "contact:website":
+      if (value.indexOf(":") == -1) {
+        return this.makeLink("//" + value, value, true);
+      }
       return this.makeLink(value, value, true);
     case "wikipedia":
       var parts = value.split(':');
