@@ -91,7 +91,7 @@ FeaturePopup = OpenLayers.Class({
       return this.processContactTag(k[0], value);
     case "contact":
       if (k.length > 1) {
-        return this.processContactTag(k[1]);
+        return this.processContactTag(k[1], value);
       }
       return key;
     case "wikipedia":
