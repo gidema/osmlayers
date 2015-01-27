@@ -5,6 +5,7 @@ $(document).ready(function () {
 
 var OsmLayers = OpenLayers.Class( {
   baseUrl : "http://overpass-api.de/api/interpreter/",
+  loadCount : 0,
   zoom_data_limit : 12,
   ls : null,
   plink : new OpenLayers.Control.Permalink({base: "?map="}),
@@ -218,6 +219,20 @@ var OsmLayers = OpenLayers.Class( {
 //    var lonLat = new OpenLayers.LonLat(lon, lat).transform(new OpenLayers.Projection("EPSG:4326"), 
 //       new OpenLayers.Projection("EPSG:900913"));
     return layers;
+  },
+  
+  loadStart: function() {
+    if (this.loadCount == 0) {
+      OsmLayers.setStatusText('<img src="img/zuurstok.gif"></img>');
+    };
+    this.loadCount++;
+  },
+  
+  loadEnd: function() {
+    this.loadCount--;
+    if (this.loadCount == 0) {
+      osmLayers.setStatusText("");
+    };
   },
   /*
    * Set the status
