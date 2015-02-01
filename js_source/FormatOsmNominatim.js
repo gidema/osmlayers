@@ -1,14 +1,11 @@
 /* ======================================================================
-    OpenLayers/Format/OSMExtended.js
+    OpenLayers/Format/OsmNominatim.js
    ====================================================================== */
 
 /* Copyright (c) 2006-2013 by OpenLayers Contributors (see authors.txt for
  * full list of contributors). Published under the 2-clause BSD license.
  * See license.txt in the OpenLayers distribution or repository for the
  * full text of the license. */
-/*
- * Extended with an option to show the center of an area as a node
- */
 
 /**
  * @requires OpenLayers/Format/XML.js
@@ -27,7 +24,7 @@
  * Inherits from:
  *  - <OpenLayers.Format.XML>
  */
-OpenLayers.Format.OSMExtended = OpenLayers.Class(OpenLayers.Format.XML, {
+OpenLayers.Format.OsmNominatim = OpenLayers.Class(OpenLayers.Format.XML, {
     /**
      * Constructor: OpenLayers.Format.OSM
      * Create a new parser for OSM.
@@ -37,9 +34,10 @@ OpenLayers.Format.OSMExtended = OpenLayers.Class(OpenLayers.Format.XML, {
      *     this instance.
      */
     initialize: function(options) {
-        layer_defaults = OpenLayers.Util.extend(layer_defaults, options);
+        var layer_defaults = OpenLayers.Util.extend({}, options);
         
         // OSM coordinates are always in longlat WGS84
+        this.externalProjection = new OpenLayers.Projection("EPSG:4326");
         this.externalProjection = new OpenLayers.Projection("EPSG:4326");
         
 //        OpenLayers.Format.XML.prototype.initialize.apply(this, [layer_defaults]);
@@ -63,8 +61,7 @@ OpenLayers.Format.OSMExtended = OpenLayers.Class(OpenLayers.Format.XML, {
         var pois = this.getPois(doc);
         var feat_list = [];
         
-        for (var i = 0; i < pois.length; i++) {
-            var poi = pois[i];
+        for (var i = 0, poi; poi = pois[i]; i++) {
             var feat = new OpenLayers.Feature.Vector(
                 new OpenLayers.Geometry.Point(poi['lon'], poi['lat']),
                 poi.tags);
@@ -72,7 +69,7 @@ OpenLayers.Format.OSMExtended = OpenLayers.Class(OpenLayers.Format.XML, {
                 feat.geometry.transform(this.externalProjection, 
                     this.internalProjection);
             }
-            feat.osm_id = parseInt(poi.id);
+            feat.osm_id = parseInt(poi.osm_id);
             feat.fid = poi.type + "." + poi.osm_id;
             feat_list.push(feat);
         }
@@ -88,11 +85,9 @@ OpenLayers.Format.OSMExtended = OpenLayers.Class(OpenLayers.Format.XML, {
      */
     getPois: function(doc) {
         var node_list = doc.getElementsByTagName("place");
-        var pois = {};
-        for (var i = 0; i < node_list.length; i++) {
-            var node = node_list[i];
-            var id = node.getAttribute("id");
-            pois[id] = {
+        var pois = new Array(node_list.length);
+        for (var i = 0, node; node = node_list[i]; i++) {
+            pois[i] = {
                 lat: node.getAttribute("lat"),
                 lon: node.getAttribute("lon"),
                 node: node,
@@ -100,7 +95,7 @@ OpenLayers.Format.OSMExtended = OpenLayers.Class(OpenLayers.Format.XML, {
                 osm_id: node.getAttribute("osm_id"),
                 tagKey: node.getAttribute("class"),
                 tagValue: node.getAttribute("type"),
-                tags: getTags(node)
+                tags: this.getTags(node)
             };
         }
         return pois;
@@ -126,11 +121,10 @@ OpenLayers.Format.OSMExtended = OpenLayers.Class(OpenLayers.Format.XML, {
     getTags: function(dom_node) {
         var children = dom_node.getElementsByTagName("*");
         var tags = {};
-        for (var j = 0; j < tag_list.length; j++) {
-            var child = children;
-            tags[child.tagName] = child.innerHtml;
+        for (var j = 0, child; child = children[j]; j++) {
+            tags[child.tagName] = child.innerHTML;
         }  
         return tags;
     },
-    CLASS_NAME: "OpenLayers.Format.OSMNominatim" 
+    CLASS_NAME: "OpenLayers.Format.OsmNominatim" 
 });     

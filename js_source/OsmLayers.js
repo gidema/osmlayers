@@ -1,6 +1,6 @@
 'use strict';
 $(document).ready(function () {
-  window.osmLayers = new OsmLayers(52.09, 5.12, 13);
+  window.osmLayers = new OsmLayers(52.09, 5.12, 14, "textBox");
 });    
 
 var OsmLayers = OpenLayers.Class( {
@@ -13,15 +13,15 @@ var OsmLayers = OpenLayers.Class( {
   layerGroups : {},
   osmLayers: [],
   map : null,
-//  currentLayerGroup : null,
   hoverPopup : null,
   featurePopup : null,
 
   // Constructor  
-  initialize : function(lat, lon, zoom) {
+  initialize : function OsmLayers(lat, lon, zoom, searchBoxDiv) {
     osmlConfig(this);
     this.initMap(lat, lon, zoom);
-    this.initOsmLayers("amenity");
+    this.initSearchLayer(searchBoxDiv);
+    this.initOsmLayers();
     this.featurePopup = new FeaturePopup(this.baseUrl, this.map);
   },
   
@@ -86,13 +86,13 @@ var OsmLayers = OpenLayers.Class( {
     map.addControl(this.ls);
     
     // De Zoekbox
-    map.addControl (new OpenLayers.Control.SearchBox({
-      div: document.getElementById("osmlSearchBox"),
-      autoClose: false,
-      defaultLimit: 50,
-      minDistance: 50,
-      resultMinZoom: 13 // Hiermee stel je in op welk niveau moet worden ingezoomd nadat de zoekterm is gevonden      
-    }));
+//    map.addControl (new OpenLayers.Control.SearchBox({
+//      div: document.getElementById("osmlSearchBox"),
+//      autoClose: false,
+//      defaultLimit: 50,
+//      minDistance: 50,
+//      resultMinZoom: 13 // Hiermee stel je in op welk niveau moet worden ingezoomd nadat de zoekterm is gevonden      
+//    }));
 
     // The base layers
     $.each(this.createBaseLayers(), function (index, layer) {
@@ -100,16 +100,36 @@ var OsmLayers = OpenLayers.Class( {
         map.addLayer(layer);
       }
     });
-
+    
+    $.each(map.layers, function(index, layer) {
+      if (!layer.isBaseLayer) {
+        layer.events.register("loadstart", this.loadStart);
+        layer.events.register("loadend", this.loadEnd);
+      }
+    });
     if(!map.getCenter()) {
       map.setCenter(new OpenLayers.LonLat(lon,lat).transform(map.displayProjection, map.projection), zoom);
     }
   },
 
+  initSearchLayer : function initSearchLayer(textBoxDivId) {
+    var textBoxDiv = $('#' + textBoxDivId)[0];
+    if (!textBoxDiv) {
+      window.console && window.console.log("No id found with this name: " + textBoxDivId);
+      return;
+    }
+    var textbox = new OsmLayers.Control.TextBoxControl({
+      div : textBoxDiv
+    });
+    this.map.addControl(textbox);
+    var searchLayer = new OsmLayers.OsmNominatimLayer("Search results", textbox, {});
+    this.map.addLayer(searchLayer);
+
+  },
   /*
    * Initialize the OSM layers
    */
-  initOsmLayers : function() {
+  initOsmLayers : function initOsmLayers() {
     var map = this.map;
     $.each(this.layerGroups, function(name, group) {
       $.each(group.layers, function (index, layer) {
@@ -212,8 +232,8 @@ var OsmLayers = OpenLayers.Class( {
     layers.push(arcgis);
  
     //Google    
-    var googlesat = new OpenLayers.Layer.Google("Google Sat",{type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 19});
-    layers.push(googlesat);
+//    var googlesat = new OpenLayers.Layer.Google("Google Sat",{type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 19});
+//    layers.push(googlesat);
 
     // === layers, zoom and position
 //    var lonLat = new OpenLayers.LonLat(lon, lat).transform(new OpenLayers.Projection("EPSG:4326"), 
@@ -315,7 +335,7 @@ var LayerGroup = OpenLayers.Class ({
   name: null,
   layers: null,
   
-  initialize: function(osml, id, name, layerIds) {
+  initialize: function LayerGroup(osml, id, name, layerIds) {
     this.id = id;
     this.name = name;
     this.layers = [];
@@ -328,5 +348,5 @@ var LayerGroup = OpenLayers.Class ({
           alert("Unknown layer: " + id);
         }
     }, this);
-  }
+  },
 });
