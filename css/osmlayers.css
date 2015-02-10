@@ -191,7 +191,33 @@ div.info {
     border-style: solid;
  */
   margin: 2px;
-  padding: 5px;
+  padding: 0px !important;
+  overflow: hidden;
+  min-width: 300px;
+  min-height: 200px;
+  width: auto !important;
+  height: auto !important;
+}
+
+.olPopupCloseBox {
+	top: 8px !important;
+	right: 8px !important;
+}
+
+#popup-tabs.ui-tabs .ui-tabs-nav .ui-tabs-anchor {
+  padding: 0.2em;
+}
+
+#popup-tabs div ul {
+  list-style: outside none none;
+  padding: 10px;
+}
+#popupMain {
+	overflow: scroll;
+}
+
+#popupDetail {
+	overflow: scroll;
 }
 
 div.olMapViewport {

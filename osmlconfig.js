@@ -1,4 +1,3 @@
-'use strict';
 function osmlConfig(osml) {
   osml.addLayer("osmBench","Bench","amenity=bench","letter_b.png");
   osml.addLayer("osmPostbox","Post box","amenity=post_box","letter_p.png");

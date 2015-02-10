@@ -1,4 +1,4 @@
-name,id,query,marker
+name,id,query,icon
 Bench,osmBench,amenity=bench,letter_b.png
 Post box,osmPostbox,amenity=post_box,letter_p.png
 Post office,osmPostoffice,amenity=post_office,postal.png
@@ -61,6 +61,7 @@ Books/Stationary,osmBooks,"[shop=books],[shop=stationery]",library.png
 Photo,osmPhoto,shop=photo,photography.png
 Toys,osmToys,shop=toys,toys.png
 Gift,osmGift,shop=gift,gifts.png
+name,id,query,icon
 Bicycle,osmBicycle,shop=bicycle,bicycle_shop.png
 Musical instruments,osmMusicalinstruments,shop=musical_instrument,music.png
 Restaurant,osmRestaurant,amenity=restaurant,restaurant.png
