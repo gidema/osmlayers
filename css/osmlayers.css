@@ -200,24 +200,8 @@ div.info {
 }
 
 .olPopupCloseBox {
-	top: 8px !important;
-	right: 8px !important;
-}
-
-#popup-tabs.ui-tabs .ui-tabs-nav .ui-tabs-anchor {
-  padding: 0.2em;
-}
-
-#popup-tabs div ul {
-  list-style: outside none none;
-  padding: 10px;
-}
-#popupMain {
-	overflow: scroll;
-}
-
-#popupDetail {
-	overflow: scroll;
+  top: 8px !important;
+  right: 8px !important;
 }
 
 div.olMapViewport {
@@ -275,12 +259,43 @@ div.olMapViewport {
   cursor: pointer;
 }
 
-/* Taginfo */
-div.pois {
-  font-size: 80%;
+#popup-tabs.ui-tabs .ui-tabs-panel {
+  padding: 0.5em;
+  font-size: 0.9em;
 }
 
-div.poi h3 {
+.ui-tabs-panel a {
+  text-decoration: none;
+  color: blue;
+}
+
+.ui-tabs-panel h2 {
   margin: 0.2em 0;
 }
 
+#popup-tabs.ui-tabs .ui-tabs-nav .ui-tabs-anchor {
+  padding: 0.2em;
+}
+
+#popup-tabs div ul {
+  list-style: outside none none;
+  padding: 10px;
+}
+#popupMain {
+  overflow: scroll;
+}
+
+#popupDetail {
+  overflow: scroll;
+}
+
+dt { 
+  float: left;
+  clear: left;
+  font-weight: bolder;
+  padding-right: 10px;
+}
+
+ dt:after { 
+  content: ":"; 
+}
