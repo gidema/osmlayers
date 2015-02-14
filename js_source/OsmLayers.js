@@ -12,16 +12,15 @@ var OsmLayers = OpenLayers.Class( {
   layerGroups : {},
   osmLayers: [],
   map : null,
-//  currentLayerGroup : null,
   hoverPopup : null,
-  featurePopup : null,
+//  featurePopup : null,
 
   // Constructor  
   initialize : function(lat, lon, zoom) {
     osmlConfig(this);
     this.initMap(lat, lon, zoom);
     this.initOsmLayers("amenity");
-    this.featurePopup = new FeaturePopup(this.baseUrl, this.map);
+//    this.featurePopup = new FeaturePopup(this.baseUrl, this.map);
   },
   
   // Add a new layer
@@ -65,7 +64,7 @@ var OsmLayers = OpenLayers.Class( {
       theme: null, // zie stylesheet
       eventListeners: {
         featureclick: function(e) {
-          self.featurePopup.click(e);
+           self.featureclick(e);
         },
 //        featureover: function(e) {
 //          self.featureover(e);
@@ -76,6 +75,14 @@ var OsmLayers = OpenLayers.Class( {
       }
     } );
     var map = this.map;
+    map.Z_INDEX_BASE = {
+        BaseLayer: 100,
+        Overlay: 325,
+        Feature: 725,
+        Popup: 1500,
+        Control: 2000
+    },
+
     // The layer switcher
     this.ls = new OsmLayers.LayerTreeSwitcher({
       div: document.getElementById("osmlLayerSelector"),
@@ -122,6 +129,11 @@ var OsmLayers = OpenLayers.Class( {
    */
   zoomValid: function() {
     return this.map.getZoom() > this.zoom_data_limit;
+  },
+  
+  featureclick: function(event) {
+      var popup = new osml.FeaturePopup(event, map);
+      this.map.addPopup(popup, true);
   },
   
   featureover: function(event) {

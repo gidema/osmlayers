@@ -70,4 +70,48 @@ osml.widgets.ViewKvk = function(data) {
     };
 };
 
+/**
+ * Link to the (wind)mill site 'De hollandse Molen'
+ * 
+ * @param data
+ * @returns {osml.widgets.ViewKvk}
+ */
+osml.widgets.ViewDeHollandseMolen = function(data) {
+    var dhm_id = data.tags['dhm_id'];
+    
+    this.check = function() {
+        if (dhm_id) {
+            data.usedTags['dhm_id'] = true;
+            return true;
+        }
+    };
+    
+    this.toHtml = function() {
+        var params = {
+            v : '1',
+            mid : dhm_id,
+            molenid : dhm_id
+        };
+        var url = osml.formatUrl('http://www.molens.nl/site/dbase/molen.php', params);
+        return osml.makeLink(url, 'De Hollandsche Molen');
+    };
+};
 
+osml.widgets.ViewMolendatabase = function(data) {
+    var mdb_id = data.tags['mdb_id'];
+    
+    this.check = function() {
+        if (mdb_id) {
+            data.usedTags['mdb_id'] = true;
+            return true;
+        }
+    };
+    
+    this.toHtml = function() {
+        var params = {
+            nummer : mdb_id
+        };
+        var url = osml.formatUrl('http://www.molendatabase.nl/nederland/molen.php', params);
+        return osml.makeLink(url, 'Molendatabase');
+    };
+};

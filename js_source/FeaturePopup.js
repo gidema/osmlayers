@@ -1,51 +1,42 @@
+window.osml = window.osml || {};
 /**
  * FeaturePopup The FeaturePopup class creates the Popup window for the info
  * about the selected OSM feature
  */
-FeaturePopup = OpenLayers.Class({
-            genericUrl : null,
-            map : null,
-            popup : null,
+osml.FeaturePopup = OpenLayers.Class(OpenLayers.Popup, {
+            xy : null, // map projection coordinates
+            lonlat : null, // WGS84 coordinates 
+            zoom : 18, // Zoom level for viewing on other sites
 
             // Constructor
-            initialize : function(url, map) {
-                this.genericUrl = url;
-                this.map = map;
+            initialize : function(event, map) {
+                this.xy = event.feature.geometry.getBounds().getCenterLonLat();
+                this.lonlat = this.xy.clone().transform(map.projection,
+                        map.displayProjection); // WGS84 coordinaten
+                OpenLayers.Popup.prototype.initialize.apply(this, 
+                        ['location_info', this.xy, new OpenLayers.Size(300, 400), '', true]);
+                this.closeOnMove = false;
+                this.autoSize = false;
+                this.size = new OpenLayers.Size(300, 400);
+                this.panMapIfOutOfView = true;
+                this.opacity = null;
+                this.contentHTML = this.processFeature(event.feature);
+                $(this.contentDiv.firstChild).tabs();
             },
-
-            // Click event
-            click : function(event) {
-                var xy = event.feature.geometry.getBounds().getCenterLonLat();
-                var lonlat = xy.clone().transform(this.map.projection,
-                        this.map.displayProjection); // WGS84 coordinaten
-                // (EPSG:4326)
-                this.popup = new OpenLayers.Popup("location_info", xy, null, "",
-                        true);
-                this.popup.closeOnMove = false;
-                this.popup.autoSize = false;
-                this.popup.size = new OpenLayers.Size(300, 400);
-                this.popup.panMapIfOutOfView = true;
-                this.popup.opacity = null;
-                this.popup.contentHTML = this.processFeature(event.feature, lonlat,
-                        18);
-                this.map.addPopup(this.popup, true);
-                $("#popup-tabs").tabs();
-            },
-
             /*
              * Create the div element for a single feature
              */
-            processFeature : function(feature, lonlat, zoom) {
+            processFeature : function(feature) {
                 var fid = feature.fid.split(".");
                 return this.processElement({
                     type : fid[0],
                     id : fid[1],
                     tags : feature.attributes,
                     usedTags : {},
-                    lonlat : lonlat,
-                    lon : lonlat.lon,
-                    lat : lonlat.lat,
-                    zoom : zoom
+                    lonlat : this.lonlat,
+                    lon : this.lonlat.lon,
+                    lat : this.lonlat.lat,
+                    zoom : this.zoom
                 });
             },
 
@@ -53,7 +44,7 @@ FeaturePopup = OpenLayers.Class({
              * Create the popup content
              */
             processElement : function(data) {
-                var div = this.popup.contentDiv;
+                var div = this.contentDiv;
                 div.innerHTML = '<div id="popup-tabs"><ul></ul></div>';
                 this.tabs = div.firstChild;
                 this.addMainTab(data);
@@ -107,6 +98,8 @@ FeaturePopup = OpenLayers.Class({
                     new osml.widgets.ViewBing(data),
                     new osml.widgets.ViewMtM(data),
                     new osml.widgets.ViewMapillary(data),
+                    new osml.widgets.ViewDeHollandseMolen(data),
+                    new osml.widgets.ViewMolendatabase(data),
                     new osml.widgets.ViewBagViewer(data),
                     new osml.widgets.ViewOpenKvk(data),
                     new osml.widgets.ViewKvk(data)
@@ -135,14 +128,3 @@ FeaturePopup = OpenLayers.Class({
             },
             CLASS_NAME : "FeaturePopup"
         });
-
-String.format = function() {
-    var s = arguments[0];
-    for (var i = 0; i < arguments.length - 1; i++) {       
-      var reg = new RegExp('\\{" + i + "\\}', 'gm');             
-      s = s.replace(reg, arguments[i + 1]);
-    }
-
-    return s;
-};
-

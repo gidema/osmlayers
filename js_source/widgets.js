@@ -1,6 +1,6 @@
 // Temporarily define the osml namespace here.
-if (typeof osml === 'undefined') osml = {};
-if (typeof osml.widgets === 'undefined') osml.widgets = {};
+window.osml = window.osml || {};
+window.osml.widgets = window.osml.widgets || {};
 
 osml.widgets.Title = function(data) {
     var title = '';
