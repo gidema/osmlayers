@@ -55,7 +55,7 @@ osml.widgets.Website = function(data, type) {
         return true;
     };
     this.toHtml = function() {
-        var link = osml.widgets.makeLink(site, site, true);
+        var link = osml.makeLink(site, site, true);
         return '<div class="website">' + link + '</div>';
     };
 };
@@ -69,7 +69,7 @@ osml.widgets.Phone = function(data) {
         return true;
     };
     this.toHtml = function() {
-        var link = osml.widgets.makeLink("tel:" + phone, phone, true);
+        var link = osml.makeLink("tel:" + phone, phone, true);
         return '<div class="phone">' + link + '</div>';
 
     };
@@ -83,7 +83,7 @@ osml.widgets.Email = function(data) {
         return true;
     };
     this.toHtml = function() {
-        var link = osml.widgets.makeLink("mailto:" + email, email, true);
+        var link = osml.makeLink("mailto:" + email, email, true);
         return '<div class="email">' + link + '</div>';
     };
 };
@@ -95,7 +95,7 @@ osml.widgets.Fax = function(data) {
         return true;
     };
     this.toHtml = function() {
-        var link = osml.widgets.makeLink("fax:" + fax, fax, true);
+        var link = osml.makeLink("fax:" + fax, fax, true);
         return '<div class="fax">Fax:&nbsp;' + link + '</div>';
     };
 };
@@ -107,7 +107,7 @@ osml.widgets.Twitter = function(data) {
         return true;
     };
     this.toHtml = function() {
-        var link = osml.widgets.makeLink('https://twitter.com/' + twitter, '@' + twitter, true);
+        var link = osml.makeLink('https://twitter.com/' + twitter, '@' + twitter, true);
         return '<div class="twitter">Twitter:&nbsp;' + link + '</div>';
     };
 };
@@ -123,10 +123,10 @@ osml.widgets.Facebook = function(data) {
         var link = '';
         if (value.startsWith('http') || value.startsWith('www')
                 || value.startsWith('facebook')) {
-            link = osml.widgets.makeLink(value, value, true);
+            link = osml.makeLink(value, value, true);
         }
         else {
-            link = osml.widgets.makeLink('https://www.facebook.com/' + value, value, true);
+            link = osml.makeLink('https://www.facebook.com/' + value, value, true);
         };
         return '<div class="facebook">Facebook:&nbsp;' + link + '</div>';
     };
@@ -171,7 +171,7 @@ osml.widgets.Wikipedia = function(data) {
         }
         var href = 'http://' + this.lang + 'wikipedia.org/wiki/'
                 + this.subject;
-        return '<div class="wikipedia">' + osml.widgets.makeLink(href, 'Wikipedia', true) + '</div>';
+        return '<div class="wikipedia">' + osml.makeLink(href, 'Wikipedia', true) + '</div>';
     };
 };
 
@@ -181,9 +181,9 @@ osml.widgets.BrowseOsm = function(data) {
     };
     
     this.toHtml = function() {
-        var url = osml.widgets.formatString('http://www.openstreetmap.org/browse/{0}/{1}/', data.type, data.id);
+        var url = osml.formatString('http://www.openstreetmap.org/browse/{0}/{1}/', data.type, data.id);
         var label = data.type + " " + data.id;
-        return osml.widgets.formatString('<a href="{0}" target="_blank\">{1}</a>', url, label);
+        return osml.makeLink(url, label);
     };
 };
 
@@ -196,8 +196,9 @@ osml.widgets.UnusedTags = function(data) {
         var html = '<dl>';
         $.each(data.tags, function(key, val) {
             if (!data.usedTags[key]) {
-                var url = osml.widgets.formatString("http://wiki.openstreetmap.org/wiki/Key:{0}", key);
-                html += osml.widgets.formatString('<dt><a href="{0}" target="_blank">{1}</a></dt><dd>{2}</dd>\n', url, key, val);
+                var url = osml.formatString("http://wiki.openstreetmap.org/wiki/Key:{0}", key);
+                var link = osml.makeLink(url, key);
+                html += osml.formatString('<dt>{0}</dt><dd>{1}</dd>\n', link, val);
             }
         });
         html += '</dl>';
@@ -222,8 +223,8 @@ osml.widgets.ViewOsm = function(data) {
     };
     
     this.toHtml = function() {
-        var url = osml.widgets.formatUrl('http://www.openstreetmap.org', params);
-        return osml.widgets.formatString('<a href="{0}" target="_blank\"><img src="img/osm.gif">OSM</a>', url);
+        var url = osml.formatUrl('http://www.openstreetmap.org', params);
+        return osml.makeLink(url, '<img src="img/osm.gif">OSM');
     };
 };
 
@@ -239,8 +240,8 @@ osml.widgets.ViewGoogle = function(data) {
     };
     
     this.toHtml = function() {
-        var url = osml.widgets.formatUrl('https://maps.google.nl/maps', params);
-        return osml.widgets.formatString('<a href="{0}" target="_blank"><img src="img/google.gif">Google</a>', url);
+        var url = osml.formatUrl('https://maps.google.nl/maps', params);
+        return osml.makeLink(url, '<img src="img/google.gif">Google');
     };
 };
 
@@ -258,8 +259,8 @@ osml.widgets.ViewBing = function(data) {
     };
     
     this.toHtml = function() {
-        var url = osml.widgets.formatUrl('http://www.bing.com/maps/', params);
-        return osml.widgets.formatString('<a href="{0}" target="_blank"><img src="img/bing.gif">Bing</a>', url);
+        var url = osml.formatUrl('http://www.bing.com/maps/', params);
+        return osml.makeLink(url, '<img src="img/bing.gif">Bing');
     };
 };
 
@@ -277,8 +278,8 @@ osml.widgets.ViewMtM = function(data) {
     };
     
     this.toHtml = function() {
-        var url = osml.widgets.formatUrl('http://mijndev.openstreetmap.nl/~allroads/mtm/', params);
-        return osml.widgets.formatString('<a href="{0}" target="_blank\"><img src="img/osm.gif">MtM</a>', url);
+        var url = osml.formatUrl('http://mijndev.openstreetmap.nl/~allroads/mtm/', params);
+        return osml.makeLink(url, '<img src="img/osm.gif">MtM');
     };
 };
 osml.widgets.ViewMapillary = function(data) {
@@ -290,9 +291,9 @@ osml.widgets.ViewMapillary = function(data) {
     };
     
     this.toHtml = function() {
-        var url = osml.widgets.formatString('http://www.mapillary.com/map/im/bbox/{0}/{1}/{2}/{3}',
+        var url = osml.formatString('http://www.mapillary.com/map/im/bbox/{0}/{1}/{2}/{3}',
             (lat - 0.005), (lat + 0.005), (lon - 0.005), (lon + 0.005));
-        return osml.widgets.formatString('<a href="{0}" target="_blank\"><img src="img/mapillary.png">Mapillary</a>', url);
+        return osml.makeLink(url, '<img src="img/mapillary.png">Mapillary');
     };
 };
 
@@ -311,8 +312,8 @@ osml.widgets.ViewBagViewer = function(data) {
         var params = {
             searchQuery : id
         };
-        var url = osml.widgets.formatUrl('https://bagviewer.kadaster.nl/lvbag/bag-viewer/index.html#/', params);
-        return osml.widgets.formatString('<a href="{0}" target="_blank\">BAG Viewer: {1}</a>', url, id);
+        var url = osml.formatUrl('https://bagviewer.kadaster.nl/lvbag/bag-viewer/index.html#/', params);
+        return osml.makeLink(url, 'BAG Viewer: ' + id);
     };
 };
 osml.widgets.ViewOpenKvk = function(data) {
@@ -326,7 +327,7 @@ osml.widgets.ViewOpenKvk = function(data) {
     
     this.toHtml = function() {
         var url = 'https://openkvk.nl/zoeken/' + postcode;
-        return osml.widgets.formatString('<a href="{0}" target="_blank\">Open KvK (Chambre of commerce)</a>', url);
+        return osml.makeLink(url, 'Open KvK (Chambre of commerce)');
     };
 };
 osml.widgets.ViewKvk = function(data) {
@@ -343,8 +344,8 @@ osml.widgets.ViewKvk = function(data) {
         var params = {
             q : postcode + (housenr ? ' ' + housenr : '')
         };
-        var url = osml.widgets.formatUrl('http://www.kvk.nl/orderstraat/', params);
-        return osml.widgets.formatString('<a href="{0}" target="_blank\">KvK (Chambre of commerce)</a>', url);
+        var url = osml.formatUrl('http://www.kvk.nl/orderstraat/', params);
+        return osml.makeLink(url, 'KvK (Chambre of commerce)');
     };
 };
 
@@ -366,8 +367,8 @@ osml.widgets.EditJosm = function(data) {
     };
 
     this.toHtml = function() {
-        var url = osml.widgets.formatUrl('http://localhost:8111/load_and_zoom', params);
-        return osml.widgets.formatString('<a href="{0}" target="_blank">JOSM</a>', url);
+        var url = osml.formatUrl('http://localhost:8111/load_and_zoom', params);
+        return osml.makeLink(url, 'JOSM');
 
     };
 };
@@ -386,8 +387,8 @@ osml.widgets.EditOnline = function(data, type) {
     
     this.toHtml = function() {
         var name = (type == 'id' ? 'ID&nbsp;editor' : 'Potlatch&nbsp2');
-        var url = osml.widgets.formatUrl('http://www.openstreetmap.org/edit', params);
-        return osml.widgets.formatString('<a href="{0}" target="_blank">{1}</a>', url, name);
+        var url = osml.formatUrl('http://www.openstreetmap.org/edit', params);
+        return osml.makeLink(url, name);
     };
 };
 
@@ -433,9 +434,9 @@ osml.widgets.WidgetGroup = function(data, widgets, format) {
     };
 };
 
-osml.widgets.makeLink = function(href, text, newPage) {
+osml.makeLink = function(href, text, newPage) {
     var html = "<a ";
-    if (newPage)
+    if (typeof newPage == 'undefined' || newPage === true)
         html += 'target="_blank" ';
     if (href.indexOf(":") == -1) {
         return html + 'href=//"' + href + '">' + text + "</a>";
@@ -443,7 +444,7 @@ osml.widgets.makeLink = function(href, text, newPage) {
     return html + 'href="' + href + '">' + text + "</a>";
 };
 
-osml.widgets.formatString = function() {
+osml.formatString = function() {
     var s = arguments[0];
     for (var i = 0; i < arguments.length - 1; i++) {       
       var reg = new RegExp('\\{' + i + '\\}', 'gm');             
@@ -452,7 +453,7 @@ osml.widgets.formatString = function() {
     return s;
 };
 
-osml.widgets.formatUrl = function(url, params) {
+osml.formatUrl = function(url, params) {
     var u = url;
     var first = true;
     for (var key in params) {
