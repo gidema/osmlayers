@@ -319,7 +319,7 @@ osml.widgets.ViewOpenKvk = function(data) {
     var postcode = data.tags['addr:postcode'];
     
     this.check = function() {
-        if (postcode.match('^[0-9]{4}[A-Z]{2}$')) {
+        if (postcode && postcode.match('^[0-9]{4}[A-Z]{2}$')) {
             return true;
         }
     };
@@ -334,14 +334,14 @@ osml.widgets.ViewKvk = function(data) {
     var housenr = data.tags['addr:housenumber'];
     
     this.check = function() {
-        if (postcode.match('^[0-9]{4}[A-Z]{2}$')) {
+        if (postcode && postcode.match('^[0-9]{4}[A-Z]{2}$')) {
             return true;
         }
     };
     
     this.toHtml = function() {
         var params = {
-            q : postcode + ' ' + housenr
+            q : postcode + (housenr ? ' ' + housenr : '')
         };
         var url = osml.widgets.formatUrl('http://www.kvk.nl/orderstraat/', params);
         return osml.widgets.formatString('<a href="{0}" target="_blank\">KvK (Chambre of commerce)</a>', url);
