@@ -107,7 +107,9 @@ FeaturePopup = OpenLayers.Class({
                     new osml.widgets.ViewBing(data),
                     new osml.widgets.ViewMtM(data),
                     new osml.widgets.ViewMapillary(data),
-                    new osml.widgets.ViewBagViewer(data)
+                    new osml.widgets.ViewBagViewer(data),
+                    new osml.widgets.ViewOpenKvk(data),
+                    new osml.widgets.ViewKvk(data)
                 ];
                 var widget = new osml.widgets.WidgetGroup(data, widgets, 'ul');
                 var html = '';

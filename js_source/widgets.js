@@ -315,7 +315,40 @@ osml.widgets.ViewBagViewer = function(data) {
         return osml.widgets.formatString('<a href="{0}" target="_blank\">BAG Viewer: {1}</a>', url, id);
     };
 };
+osml.widgets.ViewOpenKvk = function(data) {
+    var postcode = data.tags['addr:postcode'];
+    
+    this.check = function() {
+        if (postcode.match('^[0-9]{4}[A-Z]{2}$')) {
+            return true;
+        }
+    };
+    
+    this.toHtml = function() {
+        var url = 'https://openkvk.nl/zoeken/' + postcode;
+        return osml.widgets.formatString('<a href="{0}" target="_blank\">Open KvK (Chambre of commerce)</a>', url);
+    };
+};
+osml.widgets.ViewKvk = function(data) {
+    var postcode = data.tags['addr:postcode'];
+    var housenr = data.tags['addr:housenumber'];
+    
+    this.check = function() {
+        if (postcode.match('^[0-9]{4}[A-Z]{2}$')) {
+            return true;
+        }
+    };
+    
+    this.toHtml = function() {
+        var params = {
+            q : postcode + ' ' + housenr
+        };
+        var url = osml.widgets.formatUrl('http://www.kvk.nl/orderstraat/', params);
+        return osml.widgets.formatString('<a href="{0}" target="_blank\">KvK (Chambre of commerce)</a>', url);
+    };
+};
 
+http://www.kvk.nl/orderstraat/?q=3523CK 23&start=0
 osml.widgets.EditJosm = function(data) {
     var area = 0.002; // was 0.01
     var top = data.lat + area;
