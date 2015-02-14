@@ -7,21 +7,31 @@
  */
 osml.widgets.ViewBagViewer = function(data) {
     var bagId = data.tags['ref:bag'];
+    var pc = data.tags['addr:postcode'];
+    var housenr = data.tags['addr:housenumber'];
     
     this.check = function() {
         if (bagId) {
             data.usedTags['ref:bag'] = true;
             return true;
         }
+        if (pc && pc.match('^[0-9]{4}[A-Z]{2}$') && housenr) {
+            return true;
+        }
     };
     
     this.toHtml = function() {
-        var id = OpenLayers.Number.zeroPad(bagId, 16);
+        var query;
+        if (bagId) {
+            query = OpenLayers.Number.zeroPad(bagId, 16);
+        } else {
+            query = pc.substr(0, 4) + ' ' + pc.substr(4, 2) + ' ' + housenr;
+        };
         var params = {
-            searchQuery : id
+            searchQuery : query.replace(' ', '%%20')
         };
         var url = osml.formatUrl('https://bagviewer.kadaster.nl/lvbag/bag-viewer/index.html#/', params);
-        return osml.makeLink(url, 'BAG Viewer: ' + id);
+        return osml.makeLink(url, 'BAG Viewer: ' + query);
     };
 };
 

@@ -14,14 +14,12 @@ osml.FeaturePopup = OpenLayers.Class(OpenLayers.Popup, {
                 this.lonlat = this.xy.clone().transform(map.projection,
                         map.displayProjection); // WGS84 coordinaten
                 OpenLayers.Popup.prototype.initialize.apply(this, 
-                        ['location_info', this.xy, new OpenLayers.Size(300, 400), '', true]);
+                        ['location_info', this.xy, new OpenLayers.Size(350, 250), '', true]);
                 this.closeOnMove = false;
                 this.autoSize = false;
-                this.size = new OpenLayers.Size(300, 400);
                 this.panMapIfOutOfView = true;
                 this.opacity = null;
-                this.contentHTML = this.processFeature(event.feature);
-                $(this.contentDiv.firstChild).tabs();
+                this.processFeature(event.feature);
             },
             /*
              * Create the div element for a single feature
@@ -44,23 +42,24 @@ osml.FeaturePopup = OpenLayers.Class(OpenLayers.Popup, {
              * Create the popup content
              */
             processElement : function(data) {
-                var div = this.contentDiv;
-                div.innerHTML = '<div id="popup-tabs"><ul></ul></div>';
-                this.tabs = div.firstChild;
+                this.contentDiv.innerHTML = '<ul></ul>';
                 this.addMainTab(data);
                 this.addDetailTab(data);
                 this.addViewTab(data);
                 this.addEditTab(data);
+                $(this.contentDiv).tabs();
+                // a bit of a hack to prevent the parent class from overwriting the content.
+                this.contentHTML = this.contentDiv.innerHTML;
             },
 
             addTab : function(id, name, html) {
                 var li = document.createElement('li');
                 li.innerHTML = '<a href="#' + id + '">' + name + '</a>';
-                this.tabs.firstChild.appendChild(li);
+                this.contentDiv.firstChild.appendChild(li);
                 var tab = document.createElement('div');
                 tab.id = id;
                 tab.innerHTML = html;
-                this.tabs.appendChild(tab);
+                this.contentDiv.appendChild(tab);
             },
 
             addMainTab : function(data) {

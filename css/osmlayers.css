@@ -177,9 +177,10 @@ div.info {
 /* Hieronder is de style voor het popupvenster. */
 
 .olPopup {
-  border: 1px solid #000080 !important;
+/*  border: 1px solid #000080 !important;
   background-color: #ffffef !important;
-  opacity: 0.9 !important;
+  opacity: 0.9 !important;*/
+  height : auto !important;
 }
 
 .olPopupContent {
@@ -190,11 +191,10 @@ div.info {
     border-width: 1px;
     border-style: solid;
  */
-  margin: 2px;
   padding: 0px !important;
   overflow: hidden;
-  min-width: 300px;
-  min-height: 200px;
+/*  min-width: 300px;
+  min-height: 200px; */
   width: auto !important;
   height: auto !important;
 }
@@ -259,25 +259,25 @@ div.olMapViewport {
   cursor: pointer;
 }
 
-#popup-tabs.ui-tabs .ui-tabs-panel {
+#location_info ui-tabs .ui-tabs-panel {
   padding: 0.5em;
   font-size: 0.9em;
 }
 
 .ui-tabs-panel a {
   text-decoration: none;
-  color: blue;
+  color: #377961;
 }
 
 .ui-tabs-panel h2 {
   margin: 0.2em 0;
 }
 
-#popup-tabs.ui-tabs .ui-tabs-nav .ui-tabs-anchor {
+#location_info ui-tabs .ui-tabs-nav .ui-tabs-anchor {
   padding: 0.2em;
 }
 
-#popup-tabs div ul {
+#location_info div ul {
   list-style: outside none none;
   padding: 10px;
 }
