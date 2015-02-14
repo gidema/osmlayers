@@ -297,59 +297,6 @@ osml.widgets.ViewMapillary = function(data) {
     };
 };
 
-osml.widgets.ViewBagViewer = function(data) {
-    var bagId = data.tags['ref:bag'];
-    
-    this.check = function() {
-        if (bagId) {
-            data.usedTags['ref:bag'] = true;
-            return true;
-        }
-    };
-    
-    this.toHtml = function() {
-        var id = OpenLayers.Number.zeroPad(bagId, 16);
-        var params = {
-            searchQuery : id
-        };
-        var url = osml.formatUrl('https://bagviewer.kadaster.nl/lvbag/bag-viewer/index.html#/', params);
-        return osml.makeLink(url, 'BAG Viewer: ' + id);
-    };
-};
-osml.widgets.ViewOpenKvk = function(data) {
-    var postcode = data.tags['addr:postcode'];
-    
-    this.check = function() {
-        if (postcode && postcode.match('^[0-9]{4}[A-Z]{2}$')) {
-            return true;
-        }
-    };
-    
-    this.toHtml = function() {
-        var url = 'https://openkvk.nl/zoeken/' + postcode;
-        return osml.makeLink(url, 'Open KvK (Chambre of commerce)');
-    };
-};
-osml.widgets.ViewKvk = function(data) {
-    var postcode = data.tags['addr:postcode'];
-    var housenr = data.tags['addr:housenumber'];
-    
-    this.check = function() {
-        if (postcode && postcode.match('^[0-9]{4}[A-Z]{2}$')) {
-            return true;
-        }
-    };
-    
-    this.toHtml = function() {
-        var params = {
-            q : postcode + (housenr ? ' ' + housenr : '')
-        };
-        var url = osml.formatUrl('http://www.kvk.nl/orderstraat/', params);
-        return osml.makeLink(url, 'KvK (Chambre of commerce)');
-    };
-};
-
-http://www.kvk.nl/orderstraat/?q=3523CK 23&start=0
 osml.widgets.EditJosm = function(data) {
     var area = 0.002; // was 0.01
     var top = data.lat + area;
