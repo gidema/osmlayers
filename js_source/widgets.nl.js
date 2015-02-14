@@ -21,17 +21,14 @@ osml.widgets.ViewBagViewer = function(data) {
     };
     
     this.toHtml = function() {
-        var query;
+        var params = {};
         if (bagId) {
-            query = OpenLayers.Number.zeroPad(bagId, 16);
+            params.searchQuery = OpenLayers.Number.zeroPad(bagId, 16);
         } else {
-            query = pc.substr(0, 4) + ' ' + pc.substr(4, 2) + ' ' + housenr;
-        };
-        var params = {
-            searchQuery : query.replace(' ', '%%20')
+            params.searchQuery = pc.substr(0, 4) + '+' + pc.substr(4, 2) + '+' + housenr;
         };
         var url = osml.formatUrl('https://bagviewer.kadaster.nl/lvbag/bag-viewer/index.html#/', params);
-        return osml.makeLink(url, 'BAG Viewer: ' + query);
+        return osml.makeLink(url, 'BAG Viewer: ' + params.searchQuery);
     };
 };
 
