@@ -59,7 +59,7 @@ osml.Site = OpenLayers.Class({
         },
 
         // The layer switcher
-        this.ls = new OsmLayers.LayerTreeSwitcher({
+        this.ls = new osml.LayerTreeSwitcher({
           div: document.getElementById("osmlLayerSelector"),
           layerGroups: this.layerGroups
         });

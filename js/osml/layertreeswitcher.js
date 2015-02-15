@@ -12,7 +12,7 @@
  * Inherits from:
  *  - <OpenLayers.Control>
  */
-OsmLayers.LayerTreeSwitcher = OpenLayers.Class(OpenLayers.Control, {
+osml.LayerTreeSwitcher = OpenLayers.Class(OpenLayers.Control, {
 
     /**  
      * Property: layerStates 
