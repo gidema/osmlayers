@@ -12,7 +12,7 @@ var OsmLayers = OpenLayers.Class( {
   layerGroups : {},
   osmLayers: [],
   map : null,
-  hoverPopup : null,
+//  hoverPopup : null,
 //  featurePopup : null,
 
   // Constructor  
@@ -26,7 +26,7 @@ var OsmLayers = OpenLayers.Class( {
   // Add a new layer
   addLayer : function(id, name, query, marker) {
     var layerDef = new LayerDef(id, name, query, marker);
-    var layer = this.makeLayer(layerDef);
+    var layer = new osml.OverpassLayer(layerDef);
     this.layers[id] = layer;
   },
   
@@ -158,48 +158,6 @@ var OsmLayers = OpenLayers.Class( {
   },
 
   /*
-   * Create an OSM Vector layer for a feature using the supplied layerDef
-   */
-  makeLayer : function(layerDef) {
-    var styleMap =  new OpenLayers.StyleMap( {
-      externalGraphic: 'img/markers/' + layerDef.marker,
-      graphicWidth: 20, graphicHeight: 24, graphicYOffset: -24,
-      class: name,
-      fillColor: "#888888"
-//      strokeColor : color, 
-//      strokeOpacity : opacity,
-//      strokeWidth : size,
-//      strokeLinecap : "square", 
-//      strokeDashstyle : dash,
-//      pointRadius : radius,
-//      fillColor : "white",
-//      fillOpacity : radopacity
-    });
-    var layer =  new OpenLayers.Layer.Vector(layerDef.name, {
-      strategies : [new ZoomLimitedBBOXStrategy(12)],
-      protocol :  new OpenLayers.Protocol.HTTP( {
-        url : this.baseUrl + "?data=" + layerDef.filter,
-        format :  new OpenLayers.Format.OSMExtended( {
-          checkTags : true,
-          areaTags : ["area", "building", "amenity", "leisure"]
-//          areaTags : []
-        })
-      }),
-      styleMap : styleMap,
-      visibility : false,
-      projection :  new OpenLayers.Projection("EPSG:4326"),
-      cssClass : layerDef.id
-    });
-    layer.events.register("loadstart", layer, function() {
-      osmLayers.setStatusText('<img src="img/zuurstok.gif"></img>');
-    });
-    layer.events.register("loadend", layer, function() {
-      osmLayers.setStatusText("");
-    });
-    return layer;
-  },
-
-  /*
    * Create the base layers
    */
   createBaseLayers : function() {
@@ -250,34 +208,6 @@ var OsmLayers = OpenLayers.Class( {
     }
   }
 });            
-
-var ZoomLimitedBBOXStrategy = OpenLayers.Class(OpenLayers.Strategy.BBOX, {
-  initialize : function (zoom_data_limit) {
-    this.zoom_data_limit = zoom_data_limit;
-  //alert(zoom_data_limit);
-  },
-  update : function (options) {
-    if ('undefined' !== typeof osmLayers) {
-      var mapBounds = this.getMapBounds();
-      if (!osmLayers.zoomValid()) {
-        if (this.layer.visibility == true) {
-          osmLayers.setStatusText(" Please zoom in to view data! ");
-          this.bounds = null;
-        }
-      }
-      else if (mapBounds !== null  && ((options && options.force) || this.invalidBounds(mapBounds))) {
-        if (this.layer.visibility == true) {
-        //  ++load_counter;
-          this.calculateBounds(mapBounds);
-          this.resolution = this.layer.map.getResolution();
-          this.triggerRead(options);
-        }
-      }
-    }
-  },
-  CLASS_NAME : "ZoomLimitedBBOXStrategy"
-}
-);
 
 var LayerDef = OpenLayers.Class ({
   id: null,

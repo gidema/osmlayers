@@ -1,6 +1,8 @@
-// Temporarily define the osml namespace here.
-window.osml = window.osml || {};
-window.osml.widgets = window.osml.widgets || {};
+/**
+ * osml.widgets namespace
+ */
+osml.widgets = osml.widgets || {};
+
 
 osml.widgets.Title = function(data) {
     var title = '';
@@ -380,40 +382,3 @@ osml.widgets.WidgetGroup = function(data, widgets, format) {
         return html;
     };
 };
-
-osml.makeLink = function(href, text, newPage) {
-    var html = "<a ";
-    if (typeof newPage == 'undefined' || newPage === true)
-        html += 'target="_blank" ';
-    if (href.indexOf(":") == -1) {
-        return html + 'href=//"' + href + '">' + text + "</a>";
-    }
-    return html + 'href="' + href + '">' + text + "</a>";
-};
-
-osml.formatString = function() {
-    var s = arguments[0];
-    for (var i = 0; i < arguments.length - 1; i++) {       
-      var reg = new RegExp('\\{' + i + '\\}', 'gm');             
-      s = s.replace(reg, arguments[i + 1]);
-    }
-    return s;
-};
-
-osml.formatUrl = function(url, params) {
-    var u = url;
-    var first = true;
-    for (var key in params) {
-        if (first === true) {
-            u = u + '?';
-            first = false;
-        }
-        else {
-            u = u + '&';
-        }
-        u = u + key + '=' + params[key];
-    }
-    return u;
-};
-
-
