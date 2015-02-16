@@ -122,3 +122,62 @@ osml.widgets.ViewMolendatabase = function(data) {
         return osml.makeLink(url, 'Molendatabase');
     };
 };
+osml.widgets.Bustimes = function(data) {
+    var cxx = data.tags['cxx:code'];
+    
+    this.check = function() {
+        if (cxx) {
+            data.usedTags['cxx:code'] = true;
+            return true;
+        }
+    };
+    
+    this.toHtml = function() {
+        return '<div id="bustimesbutton" class="buttonclass">' +
+            '<button onclick="osml.widgets.Bustimes.showBustimes(' + cxx +')">Bus times</button>' +
+            '</div>';
+    };
+};
+osml.widgets.Bustimes.showBustimes = function(userStopCode) {
+    var url = 'http://v0.ovapi.nl/tpc/' + userStopCode;
+    $.getJSON(url, function(data, status) {
+        if (status == 'success') {
+            var stop = null;
+            for (var id in data) { // Get the first (only) stop
+                stop = data[id];
+                break;
+            };
+            var html = osml.widgets.Bustimes.getHtml(stop);
+            var popup = new OpenLayers.Popup('bustimes', osmLayers.map.getCenter(), OpenLayers.Size(300, 200), html, true, null);
+            osmLayers.map.addPopup(popup);
+        }
+    });
+};
+osml.widgets.Bustimes.getHtml = function(data) {
+    var html = '<h3>' + data.Stop.TimingPointName + ' (' + data.Stop.TimingPointCode + ')</h3>' +
+        '<table class="bustimes">';
+    var timeTable = [];
+    for (var key in data.Passes) {
+        var pass = data.Passes[key];
+        timeTable.push({
+            destination : pass.DestinationName50,
+            lineNumber : pass.LinePublicNumber,
+            waitTime : new Date(pass.ExpectedDepartureTime).toLocaleTimeString()
+        });
+    };
+    // Sort the timeTable
+    timeTable.sort(function(a, b) {
+        if (a.waitTime == b.waitTime) return 0;
+        return (a.waitTime < b.waitTime ? -1 : 1);
+    });
+    for (var i=0; i<timeTable.length; i++) {
+        var row = timeTable[i];
+        html += '<tr>';
+        html += '<td>' + row.destination + '</td>';
+        html += '<td>' + row.lineNumber + '</td>';
+        html += '<td>' + row.waitTime + '</td>';
+        html += '</tr>';
+    };
+    html += '</table>';
+    return html;
+};

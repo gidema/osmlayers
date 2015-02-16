@@ -65,6 +65,7 @@ osml.FeaturePopup = OpenLayers.Class(OpenLayers.Popup, {
             addMainTab : function(data) {
                 var widgets = [
                     new osml.widgets.Title(data),
+                    new osml.widgets.Bustimes(data),
                     new osml.widgets.Address(data),
                     new osml.widgets.Phone(data),
                     new osml.widgets.Email(data),

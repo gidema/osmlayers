@@ -468,3 +468,8 @@
   background-position: -3px -3px;
 }
 
+.jstree-default .osmBusstop .jstree-themeicon {
+  background-image: url("../img/markers/busstop.png");
+  background-position: -3px -3px;
+}
+

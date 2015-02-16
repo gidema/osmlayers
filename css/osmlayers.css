@@ -299,3 +299,12 @@ dt {
  dt:after { 
   content: ":"; 
 }
+
+#bustimes.olPopup {
+	width: auto !important;
+}
+
+table.bustimes {
+	width: 350px;
+  font-size: 80%;
+}
