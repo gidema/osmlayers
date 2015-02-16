@@ -15,6 +15,14 @@ var /**
 osml = osml || {};
 
 /**
+ * Create a new OsmLayers site
+ */
+osml.init = function(options) {
+    osml.site = new osml.Site(options);
+};
+
+
+/**
  * Utility functions
  */
 

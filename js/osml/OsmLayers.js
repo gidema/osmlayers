@@ -1,7 +1,7 @@
 'use strict';
-$(document).ready(function () {
-  window.osmLayers = new OsmLayers(52.09, 5.12, 13);
-});    
+//$(document).ready(function () {
+//  window.osmLayers = new OsmLayers(52.09, 5.12, 13);
+//});    
 
 var OsmLayers = OpenLayers.Class( {
   baseUrl : "http://overpass-api.de/api/interpreter/",

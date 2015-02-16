@@ -4,13 +4,7 @@ $(document).ready(function () {
       div: 'map',
       lat: 52.09,
       lon: 5.12,
-      zoom: 14,
-      baseLayers: [
-        new ol.layer.Tile({
-          style: 'Road',
-          source: new ol.source.MapQuest({layer: 'osm'})
-        })
-      ]
+      zoom: 14
     },
     layerTreeControl: {
       div: 'osmlLayerSelector'

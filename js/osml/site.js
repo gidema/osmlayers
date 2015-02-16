@@ -27,7 +27,7 @@ osml.Site = OpenLayers.Class({
           controls:[
             new OpenLayers.Control.Navigation(),
             new OpenLayers.Control.PanZoomBar(),
-            this.plink,
+//            this.plink,
             new OpenLayers.Control.Attribution()],
           maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34),
           maxResolution: 156543.0399,
@@ -104,8 +104,4 @@ osml.Site = OpenLayers.Class({
         // this.ls.maximizeControl();
         map.addControl(this.ls);
     },
-
-    init : function(options) {
-        osml.site = new osml.Site(options);
-    }
 });
