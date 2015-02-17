@@ -93,6 +93,7 @@ function osmlConfig(osml) {
   osml.addLayer("osmMonument","Monument","historic=monument","monument.png");
   osml.addLayer("osmWindmill","Windmill","man_made=windmill","windmill-2.png");
   osml.addLayer("osmWatermill","Watermill","man_made=watermill","watermill-2.png");
+  osml.addLayer("osmBusstop", "Busstop", "highway=bus_stop", "busstop.png");
   
   osml.addLayerGroup("osmgAmenity", "Amenity", ["osmBench", "osmPostbox", "osmPostoffice", "osmPharmacy", "osmToilets", "osmPolice", "osmATM", "osmFuel", "osmSchool", "osmUniversity",
     "osmBicycleparking", "osmBicyclerental", "osmTaxi", "osmParking", "osmArtscentre", "osmTheatre", "osmCinema"]);
@@ -105,5 +106,5 @@ function osmlConfig(osml) {
     "osmBicycle", "osmMusicalinstruments"]); 
   osml.addLayerGroup("osmgFood", "Food", ["osmRestaurant", "osmBar", "osmCafe", "osmPub", "osmIcecream", "osmFastfood", "osmSupermarket", "osmBakery", "osmConfectionery", "osmDeli", "osmDairy",
     "osmCheese", "osmGreengrocer", "osmGrocery", "osmButcher", "osmCoffee", "osmSeafood", "osmOrganic", "osmDrinkingwater", "osmAlcohol", "osmWine", "osmBeverages"]);  
-  osml.addLayerGroup("osmgVarious", "Various", ["osmTravelagency", "osmCopyshop", "osmDefibrilator", "osmFirehose", "osmMemorial", "osmMonument", "osmWindmill", "osmWatermill"]);
+  osml.addLayerGroup("osmgVarious", "Various", ["osmBusstop","osmTravelagency", "osmCopyshop", "osmDefibrilator", "osmFirehose", "osmMemorial", "osmMonument", "osmWindmill", "osmWatermill"]);
 }
