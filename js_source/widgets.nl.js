@@ -155,27 +155,28 @@ osml.widgets.Bustimes.showBustimes = function(userStopCode) {
 };
 osml.widgets.Bustimes.getHtml = function(data) {
     var html = '<h3>' + data.Stop.TimingPointName + ' (' + data.Stop.TimingPointCode + ')</h3>' +
-        '<table class="bustimes">';
+        '<table class="bustimes">' +
+        '<tr><th>Direction</th><th>Line</th><th>Departure</th></tr>';
     var timeTable = [];
     for (var key in data.Passes) {
         var pass = data.Passes[key];
         timeTable.push({
             destination : pass.DestinationName50,
             lineNumber : pass.LinePublicNumber,
-            waitTime : new Date(pass.ExpectedDepartureTime).toLocaleTimeString()
+            departure : new Date(pass.ExpectedDepartureTime)
         });
     };
     // Sort the timeTable
     timeTable.sort(function(a, b) {
-        if (a.waitTime == b.waitTime) return 0;
-        return (a.waitTime < b.waitTime ? -1 : 1);
+        if (a.departure == b.departure) return 0;
+        return (a.departure < b.departure ? -1 : 1);
     });
     for (var i=0; i<timeTable.length; i++) {
         var row = timeTable[i];
         html += '<tr>';
         html += '<td>' + row.destination + '</td>';
         html += '<td>' + row.lineNumber + '</td>';
-        html += '<td>' + row.waitTime + '</td>';
+        html += '<td>' + row.departure.toLocaleTimeString() + '</td>';
         html += '</tr>';
     };
     html += '</table>';
