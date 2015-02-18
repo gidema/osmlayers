@@ -1,5 +1,5 @@
 /* ======================================================================
-    OpenLayers/Format/OSMExtended.js
+    osml.FormatOSMExtended.js
    ====================================================================== */
 
 /* Copyright (c) 2006-2013 by OpenLayers Contributors (see authors.txt for
@@ -27,7 +27,7 @@
  * Inherits from:
  *  - <OpenLayers.Format.XML>
  */
-OpenLayers.Format.OSMExtended = OpenLayers.Class(OpenLayers.Format.XML, {
+osml.FormatOSMExtended = OpenLayers.Class(OpenLayers.Format.XML, {
     
     /**
      * APIProperty: checkTags
@@ -90,7 +90,7 @@ OpenLayers.Format.OSMExtended = OpenLayers.Class(OpenLayers.Format.XML, {
         layer_defaults.areaTags = area;
 
         // OSM coordinates are always in longlat WGS84
-        this.externalProjection = new OpenLayers.Projection("EPSG:4326");
+        this.externalProjection = new OpenLayers.Projection('EPSG:4326');
         areasAsNode = (options.areasAsNode === true);
         
         OpenLayers.Format.XML.prototype.initialize.apply(this, [layer_defaults]);
@@ -107,7 +107,7 @@ OpenLayers.Format.OSMExtended = OpenLayers.Class(OpenLayers.Format.XML, {
      * Array({<OpenLayers.Feature.Vector>})
      */
     read: function(doc) {
-        if (typeof doc == "string") { 
+        if (typeof doc == 'string') { 
             doc = OpenLayers.Format.XML.prototype.read.apply(this, [doc]);
         }
 
@@ -151,7 +151,7 @@ OpenLayers.Format.OSMExtended = OpenLayers.Class(OpenLayers.Format.XML, {
             var feat = new OpenLayers.Feature.Vector(geometry,
                 ways[i].tags);
             feat.osm_id = parseInt(ways[i].id);
-            feat.fid = "way." + feat.osm_id;
+            feat.fid = 'way.' + feat.osm_id;
             feat_list[i] = feat;
         }; 
           
@@ -166,7 +166,7 @@ OpenLayers.Format.OSMExtended = OpenLayers.Class(OpenLayers.Format.XML, {
                     this.internalProjection);
             }
             feat.osm_id = parseInt(node.id);
-            feat.fid = node.type + "." + feat.osm_id + ".center";
+            feat.fid = node.type + '.' + feat.osm_id + '.center';
             feat_list.push(feat);
         }
         
@@ -194,7 +194,7 @@ OpenLayers.Format.OSMExtended = OpenLayers.Class(OpenLayers.Format.XML, {
                       this.internalProjection);
               }        
               feat.osm_id = parseInt(node_id); 
-              feat.fid = "node." + feat.osm_id;
+              feat.fid = 'node.' + feat.osm_id;
               feat_list.push(feat);
           }   
           // Memory cleanup
@@ -211,14 +211,14 @@ OpenLayers.Format.OSMExtended = OpenLayers.Class(OpenLayers.Format.XML, {
      * doc - {DOMElement} node to parse tags from
      */
     getNodes: function(doc) {
-        var node_list = doc.getElementsByTagName("node");
+        var node_list = doc.getElementsByTagName('node');
         var nodes = {};
         for (var i = 0; i < node_list.length; i++) {
             var node = node_list[i];
-            var id = node.getAttribute("id");
+            var id = node.getAttribute('id');
             nodes[id] = {
-                'lat': node.getAttribute("lat"),
-                'lon': node.getAttribute("lon"),
+                'lat': node.getAttribute('lat'),
+                'lon': node.getAttribute('lon'),
                 'node': node
             };
         }
@@ -233,22 +233,22 @@ OpenLayers.Format.OSMExtended = OpenLayers.Class(OpenLayers.Format.XML, {
      * doc - {DOMElement} node to parse tags from
      */
     getWays: function(doc) {
-        var way_list = doc.getElementsByTagName("way");
+        var way_list = doc.getElementsByTagName('way');
         var return_ways = [];
         for (var i = 0; i < way_list.length; i++) {
             var way = way_list[i];
             var way_object = {
-              id: way.getAttribute("id")
+              id: way.getAttribute('id')
             };
             
             way_object.tags = this.getTags(way);
             
-            var node_list = way.getElementsByTagName("nd");
+            var node_list = way.getElementsByTagName('nd');
             
             way_object.nodes = new Array(node_list.length);
             
             for (var j = 0; j < node_list.length; j++) {
-                way_object.nodes[j] = node_list[j].getAttribute("ref");
+                way_object.nodes[j] = node_list[j].getAttribute('ref');
             }  
             return_ways.push(way_object);
         }
@@ -267,39 +267,39 @@ OpenLayers.Format.OSMExtended = OpenLayers.Class(OpenLayers.Format.XML, {
     getCenterNodes: function(doc) {
         var centerNodes = [];
         var wayUsed = {};
-        var rel_list = doc.getElementsByTagName("relation");
+        var rel_list = doc.getElementsByTagName('relation');
         for (var i = 0; i < rel_list.length; i++) {
             var rel = rel_list[i];
-            var centerTags = rel.getElementsByTagName("center");
+            var centerTags = rel.getElementsByTagName('center');
             if (centerTags.length == 1) {
                 var centerNode = {
-                    id: rel.getAttribute("id"),
+                    id: rel.getAttribute('id'),
                     tags: this.getTags(rel),
-                    type: "relation",
-                    lat: centerTags[0].getAttribute("lat"),
-                    lon: centerTags[0].getAttribute("lon")
+                    type: 'relation',
+                    lat: centerTags[0].getAttribute('lat'),
+                    lon: centerTags[0].getAttribute('lon')
                 };
                 centerNodes.push(centerNode);
-                var memberList = rel.getElementsByTagName("member");
+                var memberList = rel.getElementsByTagName('member');
                 for (var j = 0; j < memberList.length; j++) {
-                    var wayId = memberList[j].getAttribute("ref");
+                    var wayId = memberList[j].getAttribute('ref');
                     wayUsed[wayId] = true;
                 }
                 
             }
         }
-        var way_list = doc.getElementsByTagName("way");
+        var way_list = doc.getElementsByTagName('way');
         for (var i = 0; i < way_list.length; i++) {
             var way = way_list[i];
-            var centerTags = way.getElementsByTagName("center");
-            var wayId = way.getAttribute("id");
+            var centerTags = way.getElementsByTagName('center');
+            var wayId = way.getAttribute('id');
             if (centerTags.length == 1 && !wayUsed[wayId]) {
                 var centerNode = {
-                    id: way.getAttribute("id"),
+                    id: way.getAttribute('id'),
                     tags: this.getTags(way),
-                    type: "way",
-                    lat: centerTags[0].getAttribute("lat"),
-                    lon: centerTags[0].getAttribute("lon")
+                    type: 'way',
+                    lat: centerTags[0].getAttribute('lat'),
+                    lon: centerTags[0].getAttribute('lon')
                 };
                 centerNodes.push(centerNode);
             }
@@ -325,12 +325,12 @@ OpenLayers.Format.OSMExtended = OpenLayers.Class(OpenLayers.Format.XML, {
      *     whether there are any interesting tags on this element.
      */
     getTags: function(dom_node, interesting_tags) {
-        var tag_list = dom_node.getElementsByTagName("tag");
+        var tag_list = dom_node.getElementsByTagName('tag');
         var tags = {};
         var interesting = false;
         for (var j = 0; j < tag_list.length; j++) {
-            var key = tag_list[j].getAttribute("k");
-            tags[key] = tag_list[j].getAttribute("v");
+            var key = tag_list[j].getAttribute('k');
+            tags[key] = tag_list[j].getAttribute('v');
             if (interesting_tags) {
                 if (!this.interestingTagsExclude[key]) {
                     interesting = true;
@@ -382,9 +382,9 @@ OpenLayers.Format.OSMExtended = OpenLayers.Class(OpenLayers.Format.XML, {
         
         this.osm_id = 1;
         this.created_nodes = {};
-        var root_node = this.createElementNS(null, "osm");
-        root_node.setAttribute("version", "0.5");
-        root_node.setAttribute("generator", "OpenLayers "+ OpenLayers.VERSION_NUMBER);
+        var root_node = this.createElementNS(null, 'osm');
+        root_node.setAttribute('version', '0.5');
+        root_node.setAttribute('generator', 'OpenLayers '+ OpenLayers.VERSION_NUMBER);
 
         // Loop backwards, because the deserializer puts nodes last, and 
         // we want them first if possible
@@ -410,7 +410,7 @@ OpenLayers.Format.OSMExtended = OpenLayers.Class(OpenLayers.Format.XML, {
     createFeatureNodes: function(feature) {
         var nodes = [];
         var className = feature.geometry.CLASS_NAME;
-        var type = className.substring(className.lastIndexOf(".") + 1);
+        var type = className.substring(className.lastIndexOf('.') + 1);
         type = type.toLowerCase();
         var builder = this.createXML[type];
         if (builder) {
@@ -454,12 +454,12 @@ OpenLayers.Format.OSMExtended = OpenLayers.Class(OpenLayers.Format.XML, {
             if (already_exists) {
                 node = this.created_nodes[id];
             } else {    
-                node = this.createElementNS(null, "node");
+                node = this.createElementNS(null, 'node');
             }
             this.created_nodes[id] = node;
-            node.setAttribute("id", id);
-            node.setAttribute("lon", geometry.x); 
-            node.setAttribute("lat", geometry.y);
+            node.setAttribute('id', id);
+            node.setAttribute('lon', geometry.x); 
+            node.setAttribute('lat', geometry.y);
             if (point.attributes) {
                 this.serializeTags(point, node);
             }
@@ -476,21 +476,21 @@ OpenLayers.Format.OSMExtended = OpenLayers.Class(OpenLayers.Format.XML, {
                 id = -this.osm_id;
                 this.osm_id++; 
             }
-            var way = this.createElementNS(null, "way");
-            way.setAttribute("id", id);
+            var way = this.createElementNS(null, 'way');
+            way.setAttribute('id', id);
             for (var i = 0; i < geometry.components.length; i++) {
                 var node = this.createXML['point'].apply(this, [geometry.components[i]]);
                 if (node.length) {
                     node = node[0];
-                    var node_ref = node.getAttribute("id");
+                    var node_ref = node.getAttribute('id');
                     nodes.push(node);
                 } else {
                     node_ref = geometry.components[i].osm_id;
                     node = this.created_nodes[node_ref];
                 }
                 this.setState(feature, node);
-                var nd_dom = this.createElementNS(null, "nd");
-                nd_dom.setAttribute("ref", node_ref);
+                var nd_dom = this.createElementNS(null, 'nd');
+                nd_dom.setAttribute('ref', node_ref);
                 way.appendChild(nd_dom);
             }
             this.serializeTags(feature, way);
@@ -516,9 +516,9 @@ OpenLayers.Format.OSMExtended = OpenLayers.Class(OpenLayers.Format.XML, {
      */
     serializeTags: function(feature, node) {
         for (var key in feature.attributes) {
-            var tag = this.createElementNS(null, "tag");
-            tag.setAttribute("k", key);
-            tag.setAttribute("v", feature.attributes[key]);
+            var tag = this.createElementNS(null, 'tag');
+            tag.setAttribute('k', key);
+            tag.setAttribute('v', feature.attributes[key]);
             node.appendChild(tag);
         }
     },
@@ -537,15 +537,15 @@ OpenLayers.Format.OSMExtended = OpenLayers.Class(OpenLayers.Format.XML, {
             var state = null;
             switch(feature.state) {
                 case OpenLayers.State.UPDATE:
-                    state = "modify";
+                    state = 'modify';
                 case OpenLayers.State.DELETE:
-                    state = "delete";
+                    state = 'delete';
             }
             if (state) {
-                node.setAttribute("action", state);
+                node.setAttribute('action', state);
             }
         }    
     },
 
-    CLASS_NAME: "OpenLayers.Format.OSM" 
+    CLASS_NAME: 'osml.FormatOSMExtended' 
 });     

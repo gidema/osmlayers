@@ -12,7 +12,7 @@ osml.OverpassLayer = OpenLayers.Class(OpenLayers.Layer.Vector, {
             strategies : [new osml.ZoomLimitedBBOXStrategy(12)],
             protocol :  new OpenLayers.Protocol.HTTP( {
                 url : this.baseUrl + "?data=" + layerDef.filter,
-                format :  new OpenLayers.Format.OSMExtended( {
+                format :  new osml.FormatOSMExtended( {
                     checkTags : true,
                     areaTags : ["area", "building", "amenity", "leisure"]
                 })
@@ -22,7 +22,8 @@ osml.OverpassLayer = OpenLayers.Class(OpenLayers.Layer.Vector, {
             projection :  new OpenLayers.Projection("EPSG:4326"),
             cssClass : layerDef.id
         }]);
-    }
+    },
+    CLASS_NAME : 'osml.OverpassLayer'
 });
 
 osml.ZoomLimitedBBOXStrategy = OpenLayers.Class(OpenLayers.Strategy.BBOX, {
@@ -31,11 +32,11 @@ osml.ZoomLimitedBBOXStrategy = OpenLayers.Class(OpenLayers.Strategy.BBOX, {
       //alert(zoom_data_limit);
     },
     update : function (options) {
-        if ('undefined' !== typeof osmLayers) {
+        if ('undefined' !== typeof osml.site) {
             var mapBounds = this.getMapBounds();
-            if (!osmLayers.zoomValid()) {
+            if (!osml.site.zoomValid()) {
                 if (this.layer.visibility == true) {
-                    osmLayers.setStatusText(" Please zoom in to view data! ");
+                    osml.site.setStatusText(" Please zoom in to view data! ");
                     this.bounds = null;
                 }
             }
@@ -49,5 +50,5 @@ osml.ZoomLimitedBBOXStrategy = OpenLayers.Class(OpenLayers.Strategy.BBOX, {
             }
         }
     },
-    CLASS_NAME : "ZoomLimitedBBOXStrategy"
+    CLASS_NAME : 'osml.ZoomLimitedBBOXStrategy'
 });

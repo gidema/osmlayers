@@ -126,5 +126,5 @@ osml.FeaturePopup = OpenLayers.Class(OpenLayers.Popup, {
                 html += '</ul>';
                 this.addTab('popup-edit', 'Edit', html);
             },
-            CLASS_NAME : "FeaturePopup"
+            CLASS_NAME : 'osml.FeaturePopup'
         });

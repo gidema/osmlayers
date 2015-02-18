@@ -6,14 +6,18 @@
 osml.Site = OpenLayers.Class({
     zoom_data_limit : 12,
     ls : null,
-
+    statusDiv : 'statusline',
     map : null,
     layers : {},
     layerTree : {},
+    layerGroups : {}, // Old style 2 level layer groups
 
     initialize : function(options) {
-    var mapOptions = options.map;
-    this.createMap(mapOptions);
+        this.statusDiv = options.statusDiv ? options.statusDiv : 'statusline';
+        var mapOptions = options.map;
+        // Initialize old style 2 level layers
+        this.initializeLayers(options.layerData, options.layerGroups);
+        this.createMap(mapOptions);
 //    this.createOsmLayers(options.layerData);
 //    var layerTreeControlOptions = options.layerTreeControl;
 //    if (layerTreeControlOptions) {
@@ -21,9 +25,21 @@ osml.Site = OpenLayers.Class({
 //    }
     },
 
+    initializeLayers : function(layerData, layerGroups) {
+        var self = this;
+        $.each(layerData, function(id, l) {
+            var layerDef = new osml.LayerDef(id, l.name, l.query, l.icon);
+            var layer = new osml.OverpassLayer(layerDef);
+            self.layers[id] = layer;
+        });
+        $.each(layerGroups, function(id, g) {
+            var group = new osml.LayerGroup(self, g.id, g.name, g.layers);
+            self.layerGroups[id] = group;
+        });
+    },
     createMap : function(options) {
         var self = this;
-        this.map = new OpenLayers.Map ("map", {
+        this.map = new OpenLayers.Map ('map', {
           controls:[
             new OpenLayers.Control.Navigation(),
             new OpenLayers.Control.PanZoomBar(),
@@ -34,19 +50,13 @@ osml.Site = OpenLayers.Class({
           numZoomLevels: 19,
           units: 'm',
           size: new OpenLayers.Size(500, 500),
-          projection: new OpenLayers.Projection("EPSG:900913"),
-          displayProjection: new OpenLayers.Projection("EPSG:4326"),
+          projection: new OpenLayers.Projection('EPSG:900913'),
+          displayProjection: new OpenLayers.Projection('EPSG:4326'),
           theme: null, // zie stylesheet
           eventListeners: {
             featureclick: function(e) {
                self.featureclick(e);
             },
-//            featureover: function(e) {
-//              self.featureover(e);
-//            },
-//            featureout: function(e) {
-//              self.featureout(e);
-//            }
           }
         } );
         var map = this.map;
@@ -59,8 +69,8 @@ osml.Site = OpenLayers.Class({
         },
 
         // The layer switcher
-        this.ls = new osml.LayerTreeSwitcher({
-          div: document.getElementById("osmlLayerSelector"),
+        this.ls = new osml.LayerTreeSwitcher(this, {
+          div: document.getElementById('osmlLayerSelector'),
           layerGroups: this.layerGroups
         });
         //this.ls.maximizeControl();
@@ -68,7 +78,7 @@ osml.Site = OpenLayers.Class({
         
         // De Zoekbox
         map.addControl (new OpenLayers.Control.SearchBox({
-          div: document.getElementById("osmlSearchBox"),
+          div: document.getElementById('osmlSearchBox'),
           autoClose: false,
           defaultLimit: 50,
           minDistance: 50,
@@ -76,32 +86,100 @@ osml.Site = OpenLayers.Class({
         }));
 
         // The base layers
-        $.each(this.createBaseLayers(), function (index, layer) {
-          if (layer) {
+        this.createBaseLayers();
+        
+        // The other layers
+        $.each(this.layers, function(id, layer) {
             map.addLayer(layer);
-          }
         });
 
         if(!map.getCenter()) {
-          map.setCenter(new OpenLayers.LonLat(lon,lat).transform(map.displayProjection, map.projection), zoom);
+          map.setCenter(new OpenLayers.LonLat(options.lon, options.lat).transform(map.displayProjection, map.projection), options.zoom);
         };
     },
 
-    createOsmLayers : function(layerData) {
-        $.each(this.layerData, function(id, l) {
-            var layerDef = new LayerDef(id, l.name, l.query, l.icon);
-            var layer = this.makeLayer(layerDef);
-            this.layers[id] = layer;
-            this.map.addLayer(layer);
-        });
+    /*
+     * Create the base layers
+     */
+    createBaseLayers : function() {
+        //In verband met de leesbaarheid heb ik MapQuest bovenaan gezet. De kleuren van die kaart zijn wat rustiger 
+        //waardoor de contrasten met de kleuren van de gebruikte tekens wat groter is.
+
+        //Mapquest  - De kaart die bovenstaat in deze lijst is de kaart die default wordt geopend.  
+        var mapquest = new OpenLayers.Layer.OSM('MapQuest','http://otile1.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png',
+          {'attribution': '© <a href="http://www.openstreetmap.org/copyright/en" target="_blank">OpenStreetMap</a>' +
+             'Contributors<br>Cartography © MapQuest<br>Overlay data licensed under ODbL '}); 
+        this.map.addLayer(mapquest);
     },
 
+//    createBaseLayers : function() {
+//        var layers = [];
+//        //In verband met de leesbaarheid heb ik MapQuest bovenaan gezet. De kleuren van die kaart zijn wat rustiger 
+//        //waardoor de contrasten met de kleuren van de gebruikte tekens wat groter is.
+//
+//        //Mapquest  - De kaart die bovenstaat in deze lijst is de kaart die default wordt geopend.  
+//        var mapquest = new OpenLayers.Layer.OSM("MapQuest","http://otile1.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
+//          {'attribution': '© <a href="http://www.openstreetmap.org/copyright/en" target="_blank">OpenStreetMap</a>' +
+//             'Contributors<br>Cartography © MapQuest<br>Overlay data licensed under ODbL '}); 
+//        layers.push(mapquest);
+//
+//        //Mapnik
+//        var layerMapnik = new OpenLayers.Layer.OSM.Mapnik("Mapnik",{'attribution': '© <a href="http://www.openstreetmap.org/copyright/en" ' +
+//          'target="_blank">OpenStreetMap</a> Contributors<br>Cartography licensed as CC-BY-SA<br>Overlay data licensed under ODbL '});
+//        layers.push(layerMapnik);
+//        
+//        //Topo
+//        var arcgis = new OpenLayers.Layer.XYZ("ArcGIS World Topo","http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/${z}/${y}/${x}",{'attribution': 'Cartography © <a href="http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer" target="_blank">ArcGIS</a><br>Overlay data OpenStreetMap Contributors, licensed under ODbL '}); 
+//        layers.push(arcgis);
+//     
+//        //Google    
+//        var googlesat = new OpenLayers.Layer.Google("Google Sat",{type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 19});
+//        layers.push(googlesat);
+//
+//        return layers;
+//      },
+
     createLayerTreeControl : function(options) {
-        this.ls = new osml.LayerTreeControl({
+        this.ls = new osml.LayerTreeControl(this, {
             div : options.div,
             layerGroups : this.layerGroups
         });
         // this.ls.maximizeControl();
         map.addControl(this.ls);
     },
+    
+    getLayer : function(id) {
+        return this.layers[id];
+    },
+    
+    getGroup : function(id) {
+        return this.layerGroups[id];
+    },
+    zoomValid: function() {
+        return this.map.getZoom() > this.zoom_data_limit;
+    },
+    featureclick: function(event) {
+        var popup = new osml.FeaturePopup(event, map);
+        this.map.addPopup(popup, true);
+    },
+    /*
+     * Set the status
+     */
+    setStatusText: function(text) {
+        var element = document.getElementById(this.statusDiv);
+        if (element != null) {
+            //var div = html_node.firstChild;
+            //div.deleteData(0, div.nodeValue.length);
+            //div.appendData(text);
+            element.innerHTML = text;
+            if (text != "") {
+                element.style.visibility = "visible";
+            }
+            else {
+                element.style.visibility = "hidden";
+            }
+        }
+    },
+
+    CLASS_NAME : 'osml.Site'
 });

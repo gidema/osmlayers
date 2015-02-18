@@ -21,6 +21,58 @@ osml.init = function(options) {
     osml.site = new osml.Site(options);
 };
 
+/**
+ * 'Classes'
+ */
+osml.LayerDef = OpenLayers.Class({
+    id : null,
+    name : null,
+    filter : null,
+    marker : null,
+
+    initialize : function LayerDef(id, name, query, marker) {
+        this.id = id;
+        this.name = name;
+        this.query = query;
+        this.filter = this.createFilter(query);
+        this.marker = marker;
+    },
+
+    createFilter : function(query) {
+        var f = "(";
+        var parts = query.split(",");
+        if (parts.length > 1) {
+            $.each(parts, function(index, value) {
+                f += "node" + value + "(bbox);way" + value + "(bbox);rel"
+                        + value + "(bbox);";
+            });
+            return f + ");(._;>;);out center;";
+        }
+        return "(node[" + query + "](bbox);way[" + query + "](bbox);rel["
+                + query + "](bbox););(._;>;);out center;";
+    }
+
+});
+
+osml.LayerGroup = OpenLayers.Class({
+    id : null,
+    name : null,
+    layers : null,
+
+    initialize : function(site, id, name, layerIds) {
+        this.id = id;
+        this.name = name;
+        this.layers = [];
+        layerIds.forEach(function(id) {
+            var layer = site.layers[id];
+            if (layer) {
+                this.layers.push(layer);
+            } else {
+                alert("Unknown layer: " + id);
+            }
+        }, this);
+    }
+});
 
 /**
  * Utility functions

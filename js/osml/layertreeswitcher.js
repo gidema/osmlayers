@@ -20,6 +20,7 @@ osml.LayerTreeSwitcher = OpenLayers.Class(OpenLayers.Control, {
      *     the last time the control was drawn. We have this in order to avoid
      *     unnecessarily redrawing the control.
      */
+    site: null,
     layerStates: null,
     tree: null,
     jsTree: null,
@@ -30,11 +31,12 @@ osml.LayerTreeSwitcher = OpenLayers.Class(OpenLayers.Control, {
      * Parameters:
      * options - {Object}
      */
-    initialize: function(options) {
+    initialize: function(site, options) {
+        this.site = site;
         OpenLayers.Control.prototype.initialize.apply(this, options);
         var treeData = this.buildTree(options.layerGroups);
         $(options.div).jstree({
-          plugins:["ui", "state", "checkbox"],
+          plugins:['ui', 'state', 'checkbox'],
           checkbox: {
             override_ui: true,
             tie_selection: true
@@ -93,14 +95,14 @@ osml.LayerTreeSwitcher = OpenLayers.Class(OpenLayers.Control, {
       var data = [];
       $.each(groups, function(id, group) {
         var treeGroup = {
-          osmlType : "group",
+          osmlType : 'group',
           text : group.name,
           children : [],
           li_attr: {class: id}
         };
         $.each(group.layers, function(id, layer) {
           treeGroup.children.push({
-            osmlType : "layer",
+            osmlType : 'layer',
             text: layer.name,
             li_attr: {class: layer.cssClass}
           });
@@ -112,35 +114,35 @@ osml.LayerTreeSwitcher = OpenLayers.Class(OpenLayers.Control, {
       };
     },
     select_node: function(e, data) {
-      var id = data.node.li_attr.class;
-      if (data.node.original.osmlType == "layer") {
-        var layer = osmLayers.getLayer(id);
-        layer.display(true);
-        layer.setVisibility(true);
-      }
-      else {
-        var group = osmLayers.getGroup(id);
-        $.each(group.layers, function (index, layer) {
-          layer.display(true);
-          layer.setVisibility(true);
-        });
-      }
+        var id = data.node.li_attr.class;
+        if (data.node.original.osmlType == 'layer') {
+            var layer = osml.site.getLayer(id);
+            layer.display(true);
+            layer.setVisibility(true);
+        }
+        else {
+            var group = osml.site.getGroup(id);
+            $.each(group.layers, function (index, layer) {
+                layer.display(true);
+                layer.setVisibility(true);
+            });
+        }
     },
     deselect_node: function(e, data) {
-      var id = data.node.li_attr.class;
-      if (data.node.original.osmlType == "layer") {
-        var layer = osmLayers.getLayer(id);
-        layer.display(false);
-        layer.setVisibility(false);
-      }
-      else {
-        var group = osmLayers.getGroup(id);
-        $.each(group.layers, function (index, layer) {
-          layer.display(false);
-          layer.setVisibility(false);
-        });
-      }
+        var id = data.node.li_attr.class;
+        if (data.node.original.osmlType == 'layer') {
+            var layer = osml.site.getLayer(id);
+            layer.display(false);
+            layer.setVisibility(false);
+        }
+        else {
+            var group = osml.site.getGroup(id);
+            $.each(group.layers, function (index, layer) {
+                layer.display(false);
+                layer.setVisibility(false);
+            });
+        }
     },
 
-    CLASS_NAME: "OsmLayers.Control.LayerTreeSwitcher"
+    CLASS_NAME: 'osml.LayerTreeSwitcher'
 });

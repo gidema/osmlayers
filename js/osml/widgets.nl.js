@@ -122,6 +122,44 @@ osml.widgets.ViewMolendatabase = function(data) {
         return osml.makeLink(url, 'Molendatabase');
     };
 };
+osml.widgets.Bustimes = function(data) {
+    var cxx = data.tags['cxx:code'];
+    // Fetch the first code in case of multiple codes.
+    if (cxx) cxx = cxx.split(';')[0];
+    // Convert the code to a number to prevent JavaScript injection
+    cxx = new Number(cxx);
+    
+    this.check = function() {
+        if (cxx && !isNaN(cxx)) {
+            data.usedTags['cxx:code'] = true;
+            return true;
+        }
+    };
+    
+    this.toHtml = function() {
+        // !Important Convert cxx to a number to prevent JavaScript injection
+        return '<div id="bustimesbutton" class="buttonclass">' +
+            '<button onclick="osml.widgets.Bustimes.showBustimes(' + new Number(cxx) +')">Bus times</button>' +
+            '</div>';
+    };
+};
+osml.widgets.Bustimes.showBustimes = function(userStopCode) {
+    var url = 'http://v0.ovapi.nl/tpc/' + userStopCode;
+    $.getJSON(url, function(data, status) {
+        if (status == 'success') {
+            var stop = null;
+            for (var id in data) { // Get the first (only) stop
+                stop = data[id];
+                break;
+            };
+            var html = osml.widgets.Bustimes.getHtml(stop);
+            var map = osml.site.map;
+            var popup = new OpenLayers.Popup('bustimes', map.getCenter(), OpenLayers.Size(300, 200), html, true, null);
+            popup.border = null;
+            map.addPopup(popup);
+        }
+    });
+};
 osml.widgets.Bustimes.getHtml = function(data) {
     var html = '<h3>' + data.Stop.TimingPointName + ' (' + data.Stop.TimingPointCode + ')</h3>' +
         '<table class="bustimes">' +

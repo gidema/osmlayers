@@ -302,6 +302,8 @@ dt {
 
 #bustimes.olPopup {
 	width: auto !important;
+	border: 1px solid;
+	padding: 5px;
 }
 
 table.bustimes {
