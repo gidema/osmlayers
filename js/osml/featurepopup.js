@@ -4,17 +4,15 @@ window.osml = window.osml || {};
  * about the selected OSM feature
  */
 osml.FeaturePopup = OpenLayers.Class(OpenLayers.Popup, {
-            xy : null, // map projection coordinates
-            lonlat : null, // WGS84 coordinates 
             zoom : 18, // Zoom level for viewing on other sites
 
             // Constructor
             initialize : function(event, map) {
-                this.xy = event.feature.geometry.getBounds().getCenterLonLat();
-                this.lonlat = this.xy.clone().transform(map.projection,
-                        map.displayProjection); // WGS84 coordinaten
+                var lonlat = event.feature.geometry.getBounds().getCenterLonLat();
                 OpenLayers.Popup.prototype.initialize.apply(this, 
-                        ['location_info', this.xy, new OpenLayers.Size(350, 250), '', true]);
+                        ['location_info', lonlat, new OpenLayers.Size(350, 250), '', true]);
+                this.lonlatWgs84 = lonlat.clone().transform(map.projection,
+                        map.displayProjection); // WGS84 coordinaten
                 this.closeOnMove = false;
                 this.autoSize = false;
                 this.panMapIfOutOfView = true;
@@ -31,9 +29,9 @@ osml.FeaturePopup = OpenLayers.Class(OpenLayers.Popup, {
                     id : fid[1],
                     tags : feature.attributes,
                     usedTags : {},
-                    lonlat : this.lonlat,
-                    lon : this.lonlat.lon,
-                    lat : this.lonlat.lat,
+                    lonlat : this.lonlatWgs84,
+                    lon : this.lonlatWgs84.lon,
+                    lat : this.lonlatWgs84.lat,
                     zoom : this.zoom
                 });
             },
@@ -42,89 +40,83 @@ osml.FeaturePopup = OpenLayers.Class(OpenLayers.Popup, {
              * Create the popup content
              */
             processElement : function(data) {
-                this.contentDiv.innerHTML = '<ul></ul>';
-                this.addMainTab(data);
-                this.addDetailTab(data);
-                this.addViewTab(data);
-                this.addEditTab(data);
+                var tabPane = new osml.widgets.TabPane([
+                    {
+                        id : 'popup-main',
+                        name : 'General',
+                        widget : this.createMainTab()
+                    },
+                    {
+                        id : 'popup-detail',
+                        name : 'Detail',
+                        widget : this.createDetailTab()
+                    },
+                    {
+                        id : 'popup-view',
+                        name : 'View',
+                        widget : this.createViewTab()
+                    },
+                    {
+                        id : 'popup-edit',
+                        name : 'Edit',
+                        widget : this.createEditTab()
+                    }]);
+                tabPane.prepare(data);
+                if (tabPane.check()) {
+                    tabPane.render(this.contentDiv);
+                }
+//                this.addDetailTab(data);
+//                this.addViewTab(data);
+//                this.addEditTab(data);
                 $(this.contentDiv).tabs();
                 // a bit of a hack to prevent the parent class from overwriting the content.
                 this.contentHTML = this.contentDiv.innerHTML;
             },
-
-            addTab : function(id, name, html) {
-                var li = document.createElement('li');
-                li.innerHTML = '<a href="#' + id + '">' + name + '</a>';
-                this.contentDiv.firstChild.appendChild(li);
-                var tab = document.createElement('div');
-                tab.id = id;
-                tab.innerHTML = html;
-                this.contentDiv.appendChild(tab);
-            },
-
-            addMainTab : function(data) {
+            createMainTab : function() {
                 var widgets = [
-                    new osml.widgets.Title(data),
-                    new osml.widgets.Bustimes(data),
-                    new osml.widgets.Address(data),
-                    new osml.widgets.Phone(data),
-                    new osml.widgets.Email(data),
-                    new osml.widgets.Website(data, 'www'),
-                    new osml.widgets.Twitter(data, 'url'),
-                    new osml.widgets.Facebook(data),
-                    new osml.widgets.Wikipedia(data)
-                ];
-                var widget = new osml.widgets.WidgetGroup(data, widgets, 'plain');
-                widget.check();
-                var html = widget.toHtml();
-                this.addTab('popup-main', 'General', html);
+                        'osml.widgets.Title',
+                        'osml.widgets.Bustimes',
+                        'osml.widgets.Address',
+                        'osml.widgets.Phone',
+                        'osml.widgets.Email',
+                        new Array('osml.widgets.Website', 'website'),
+                        new Array('osml.widgets.Website', 'url'),
+                        'osml.widgets.Twitter',
+                        'osml.widgets.Facebook',
+                        'osml.widgets.Wikipedia'
+                    ];
+                return new osml.widgets.WidgetGroup(widgets, 'plain');
             },
-
-            addDetailTab : function(data) {
+            createDetailTab : function() {
                 var widgets = [
-                    new osml.widgets.BrowseOsm(data),
-                    new osml.widgets.UnusedTags(data)
+                    'osml.widgets.BrowseOsm',
+                    'osml.widgets.UnusedTags'
                 ];
-                var widget = new osml.widgets.WidgetGroup(data, widgets, 'plain');
-                widget.check();
-                var html = widget.toHtml();
-                this.addTab('popup-detail', 'Detail', html);
+                return new osml.widgets.WidgetGroup(widgets, 'plain');
             },
-            
-            addViewTab : function(data) {
+            createViewTab : function() {
                 var widgets = [
-                    new osml.widgets.ViewOsm(data),
-                    new osml.widgets.ViewGoogle(data),
-                    new osml.widgets.ViewBing(data),
-                    new osml.widgets.ViewMtM(data),
-                    new osml.widgets.ViewMapillary(data),
-                    new osml.widgets.ViewDeHollandseMolen(data),
-                    new osml.widgets.ViewMolendatabase(data),
-                    new osml.widgets.ViewBagViewer(data),
-                    new osml.widgets.ViewOpenKvk(data),
-                    new osml.widgets.ViewKvk(data)
+                    'osml.widgets.ViewOsm',
+                    'osml.widgets.ViewGoogle',
+                    'osml.widgets.ViewBing',
+                    'osml.widgets.ViewMtM',
+                    'osml.widgets.ViewMapillary'//,
+//                    'osml.widgets.ViewDeHollandseMolen',
+//                    'osml.widgets.ViewMolendatabase',
+//                    'osml.widgets.ViewBagViewer',
+//                    'osml.widgets.ViewOpenKvk',
+//                    'osml.widgets.ViewKvk'
                 ];
-                var widget = new osml.widgets.WidgetGroup(data, widgets, 'ul');
-                var html = '';
-                if (widget.check()) {
-                    html += widget.toHtml();
-                }
-                this.addTab('popup-view', 'View', html);
+                return new osml.widgets.WidgetGroup(widgets, 'ul');
             },
-            addEditTab : function(data) {
+            createEditTab : function() {
                 var widgets = [
-                    new osml.widgets.EditJosm(data),
-                    new osml.widgets.EditOnline(data, 'id'),
-                    new osml.widgets.EditOnline(data, 'potlatch')
+                    new Array('osml.widgets.HtmlWidget', '<h2>Edit area with:</h2>'),
+                    'osml.widgets.EditJosm',
+                    new Array('osml.widgets.EditOnline', 'id'),
+                    new Array('osml.widgets.EditOnline', 'potlatch')
                 ];
-                var html = '<h2>Edit area with:</h2>';
-                html += '<ul>';
-                for (var i = 0; i<widgets.length; i++) {
-                    var widget = widgets[i];
-                    html += '<li>' + widget.toHtml() + '</li>\n';
-                };
-                html += '</ul>';
-                this.addTab('popup-edit', 'Edit', html);
+                return new osml.widgets.WidgetGroup(widgets, 'ul');
             },
             CLASS_NAME : 'osml.FeaturePopup'
         });

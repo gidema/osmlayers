@@ -159,7 +159,7 @@ osml.Site = OpenLayers.Class({
         return this.map.getZoom() > this.zoom_data_limit;
     },
     featureclick: function(event) {
-        var popup = new osml.FeaturePopup(event, map);
+        var popup = new osml.FeaturePopup(event, this.map);
         this.map.addPopup(popup, true);
     },
     /*

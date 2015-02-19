@@ -306,6 +306,12 @@ dt {
 	padding: 5px;
 }
 
+#bustimes .olPopupCloseBox {
+    right: 0px !important;
+    top: 0px !important;
+}
+
+
 table.bustimes {
 	width: 350px;
   font-size: 80%;

@@ -5,32 +5,31 @@
 /**
  * Link to bagviewer. A website for viewing Dutch buildings and addresses.
  */
-osml.widgets.ViewBagViewer = function(data) {
-    var bagId = data.tags['ref:bag'];
-    var pc = data.tags['addr:postcode'];
-    var housenr = data.tags['addr:housenumber'];
-    
-    this.check = function() {
-        if (bagId) {
-            data.usedTags['ref:bag'] = true;
-            return true;
+osml.widgets.ViewBagViewer = OpenLayers.Class(osml.widgets.Widget, {
+    prepare : function(data) {
+        this.bagId = data.tags['ref:bag'];
+        this.pc = data.tags['addr:postcode'];
+        this.housenr = data.tags['addr:housenumber'];
+        if (this.bagId) {
+            this.useTags(data, ['ref:bag']);
+            this.setActive();
         }
-        if (pc && pc.match('^[0-9]{4}[A-Z]{2}$') && housenr) {
-            return true;
+        else if (this.pc && this.pc.match('^[0-9]{4}[A-Z]{2}$') && this.housenr) {
+            this.setActive();
         }
-    };
-    
-    this.toHtml = function() {
+        else {
+            return;
+        };
         var params = {};
-        if (bagId) {
-            params.searchQuery = OpenLayers.Number.zeroPad(bagId, 16);
+        if (this.bagId) {
+            params.searchQuery = OpenLayers.Number.zeroPad(this.bagId, 16);
         } else {
-            params.searchQuery = pc.substr(0, 4) + '+' + pc.substr(4, 2) + '+' + housenr;
+            params.searchQuery = this.pc.substr(0, 4) + '+' + this.pc.substr(4, 2) + '+' + this.housenr;
         };
         var url = osml.formatUrl('https://bagviewer.kadaster.nl/lvbag/bag-viewer/index.html#/', params);
-        return osml.makeLink(url, 'BAG Viewer: ' + params.searchQuery);
-    };
-};
+        this.setHtml(osml.makeLink(url, 'BAG Viewer: ' + params.searchQuery));
+    }
+});
 
 /**
  * Link to Openkvk.nl. A Dutch open-source site for viewing chamber of commerce data.
@@ -122,70 +121,77 @@ osml.widgets.ViewMolendatabase = function(data) {
         return osml.makeLink(url, 'Molendatabase');
     };
 };
-osml.widgets.Bustimes = function(data) {
-    var cxx = data.tags['cxx:code'];
-    // Fetch the first code in case of multiple codes.
-    if (cxx) cxx = cxx.split(';')[0];
-    // Convert the code to a number to prevent JavaScript injection
-    cxx = new Number(cxx);
-    
-    this.check = function() {
+osml.widgets.Bustimes = OpenLayers.Class(osml.widgets.Widget, {
+    prepare : function(data) {
+        var cxx = data.tags['cxx:code'];
         if (cxx && !isNaN(cxx)) {
-            data.usedTags['cxx:code'] = true;
-            return true;
+            this.setActive();
+            // Fetch the first code in case of multiple codes.
+            cxx = cxx.split(';')[0];
+            // Convert the code to a number to prevent JavaScript injection
+            this.cxx = new Number(cxx);
+            this.useTags(data, ['cxx:code']);
         }
-    };
-    
-    this.toHtml = function() {
-        // !Important Convert cxx to a number to prevent JavaScript injection
-        return '<div id="bustimesbutton" class="buttonclass">' +
-            '<button onclick="osml.widgets.Bustimes.showBustimes(' + new Number(cxx) +')">Bus times</button>' +
-            '</div>';
-    };
-};
-osml.widgets.Bustimes.showBustimes = function(userStopCode) {
-    var url = 'http://v0.ovapi.nl/tpc/' + userStopCode;
-    $.getJSON(url, function(data, status) {
-        if (status == 'success') {
-            var stop = null;
-            for (var id in data) { // Get the first (only) stop
-                stop = data[id];
-                break;
-            };
-            var html = osml.widgets.Bustimes.getHtml(stop);
-            var map = osml.site.map;
-            var popup = new OpenLayers.Popup('bustimes', map.getCenter(), OpenLayers.Size(300, 200), html, true, null);
-            popup.border = null;
-            map.addPopup(popup);
-        }
-    });
-};
-osml.widgets.Bustimes.getHtml = function(data) {
-    var html = '<h3>' + data.Stop.TimingPointName + ' (' + data.Stop.TimingPointCode + ')</h3>' +
-        '<table class="bustimes">' +
-        '<tr><th>Direction</th><th>Line</th><th>Departure</th></tr>';
-    var timeTable = [];
-    for (var key in data.Passes) {
-        var pass = data.Passes[key];
-        timeTable.push({
-            destination : pass.DestinationName50,
-            lineNumber : pass.LinePublicNumber,
-            departure : new Date(pass.ExpectedDepartureTime)
+    },
+    render : function(parent) {
+        var div = document.createElement('div');
+        div.id ='bustimesbutton';
+        div.setAttribute('class', 'buttonclass');
+        parent.appendChild(div);
+        var button = document.createElement('button');
+        button.innerHTML = 'Bus times';
+        div.appendChild(button);
+        var self = this;
+        button.addEventListener("click", function(event) {
+            self.onClick(event);
         });
-    };
-    // Sort the timeTable
-    timeTable.sort(function(a, b) {
-        if (a.departure == b.departure) return 0;
-        return (a.departure < b.departure ? -1 : 1);
-    });
-    for (var i=0; i<timeTable.length; i++) {
-        var row = timeTable[i];
-        html += '<tr>';
-        html += '<td>' + row.destination + '</td>';
-        html += '<td>' + row.lineNumber + '</td>';
-        html += '<td>' + row.departure.toLocaleTimeString() + '</td>';
-        html += '</tr>';
-    };
-    html += '</table>';
-    return html;
-};
+    },
+    onClick : function(event) {
+        var self = this;
+        var url = 'http://v0.ovapi.nl/tpc/' + this.cxx;
+        $.getJSON(url, function(data, status) {
+            if (status == 'success') {
+                var stop = null;
+                for (var id in data) { // Get the first (only) stop
+                    stop = data[id];
+                    break;
+                };
+                var html = self.getDeparturesHtml(stop);
+                var map = osml.site.map;
+                var popup = new OpenLayers.Popup('bustimes', map.getCenter(), OpenLayers.Size(300, 200), html, true, null);
+                popup.border = null;
+                map.addPopup(popup);
+            };
+        });
+    },
+    // TODO Create departures Popup
+    getDeparturesHtml : function(data) {
+        var html = '<h3>' + data.Stop.TimingPointName + ' (' + data.Stop.TimingPointCode + ')</h3>' +
+            '<table class="bustimes">' +
+            '<tr><th>Direction</th><th>Line</th><th>Departure</th></tr>';
+        var timeTable = [];
+        for (var key in data.Passes) {
+            var pass = data.Passes[key];
+            timeTable.push({
+                destination : pass.DestinationName50,
+                lineNumber : pass.LinePublicNumber,
+                departure : new Date(pass.ExpectedDepartureTime)
+            });
+        };
+        // Sort the timeTable
+        timeTable.sort(function(a, b) {
+            if (a.departure == b.departure) return 0;
+            return (a.departure < b.departure ? -1 : 1);
+        });
+        for (var i=0; i<timeTable.length; i++) {
+            var row = timeTable[i];
+            html += '<tr>';
+            html += '<td>' + row.destination + '</td>';
+            html += '<td>' + row.lineNumber + '</td>';
+            html += '<td>' + row.departure.toLocaleTimeString() + '</td>';
+            html += '</tr>';
+        };
+        html += '</table>';
+        return html;
+    }
+});
