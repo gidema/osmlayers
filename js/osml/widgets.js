@@ -7,10 +7,9 @@ osml.widgets = osml.widgets || {};
  * Basic widget. This is the base class for all widgets
  */
 osml.widgets.Widget = OpenLayers.Class({
-    html: '',
-    active: false,
-    initialize: function(html) {
-        this.html = html;
+    initialize: function() {
+        this.html = '';
+        this.active = false;
     },
     prepare: function(data) {
         return;
@@ -326,10 +325,19 @@ osml.widgets.EditJosm = OpenLayers.Class(osml.widgets.Widget, {
             select : data.type + data.id
         };
         var url = osml.formatUrl('http://localhost:8111/load_and_zoom', params);
-        this.setHtml(osml.makeLink(url, 'JOSM'));
+        this.setHtml(osml.makeLink(url, 'JOSM', this.getIFrame()));
     },
-    createIframe : function() {
-//        <iframe class="hidden" height="0" width="0" name="josm_frame">
+    getIFrame : function() {
+        var iFrame = document.body.querySelector("iframe[name='josm_frame']"); 
+        if (!iFrame) {
+            iFrame = document.createElement('iframe');
+            iFrame.setAttribute('class', 'hidden');
+            iFrame.setAttribute('height', '0');
+            iFrame.setAttribute('width', '0');
+            iFrame.setAttribute('name', 'josm_frame');
+            document.body.appendChild(iFrame);
+        };
+        return 'josm_frame';
     }
 });
 
@@ -469,11 +477,11 @@ osml.widgets.createWidget = function(widgetData) {
     var path = widgetName.split('.');
     var fx = window;
     for (var i=0; i<path.length; i++) {
-        if (!fx) {
-            alert('Unknown widget: ' + widgetName);
-            return null;
-        }
         fx = fx[path[i]];
+        if (!fx) {
+            var html = '<div>Missing widget: ' + widgetName +'</div>';
+            return new osml.widgets.HtmlWidget(html);
+        }
     };
     if (params) {
         return new fx(params);

@@ -39,17 +39,17 @@ osml.LayerDef = OpenLayers.Class({
     },
 
     createFilter : function(query) {
-        var f = "(";
-        var parts = query.split(",");
+        var f = '(';
+        var parts = query.split(',');
         if (parts.length > 1) {
             $.each(parts, function(index, value) {
-                f += "node" + value + "(bbox);way" + value + "(bbox);rel"
-                        + value + "(bbox);";
+                f += 'node' + value + '(bbox);way' + value + '(bbox);rel'
+                        + value + '(bbox);';
             });
-            return f + ");(._;>;);out center;";
+            return f + ');(._;>;);out center;';
         }
-        return "(node[" + query + "](bbox);way[" + query + "](bbox);rel["
-                + query + "](bbox););(._;>;);out center;";
+        return '(node[' + query + '](bbox);way[' + query + '](bbox);rel['
+                + query + '](bbox););(._;>;);out center;';
     }
 
 });
@@ -68,7 +68,7 @@ osml.LayerGroup = OpenLayers.Class({
             if (layer) {
                 this.layers.push(layer);
             } else {
-                alert("Unknown layer: " + id);
+                alert('Unknown layer: ' + id);
             }
         }, this);
     }
@@ -84,18 +84,19 @@ osml.LayerGroup = OpenLayers.Class({
  * 
  * @param {String} href The target url
  * @param {String} text
- * @param {boolean | undefined} newPage Open the link on a new page if true or undefined
+ * @param {String | undefined} target Target for the link. _blank if undefined
  * 
  * @returns {String} The html code
  */
-osml.makeLink = function(href, text, newPage) {
-    var html = "<a ";
-    if (typeof newPage == 'undefined' || newPage === true)
-        html += 'target="_blank" ';
-    if (href.indexOf(":") == -1) {
-        return html + 'href=//"' + href + '">' + text + "</a>";
+osml.makeLink = function(href, text, target) {
+    if (!(target)) {
+        target = '_blank';
     }
-    return html + 'href="' + href + '">' + text + "</a>";
+    var html = '<a target="' + target +'" ';
+    if (href.indexOf(':') == -1) {
+        return href = '//' + href;
+    }
+    return html + 'href="' + href + '">' + text + '</a>';
 };
 
 osml.formatString = function() {

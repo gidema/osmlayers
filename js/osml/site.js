@@ -109,35 +109,24 @@ osml.Site = OpenLayers.Class({
         var mapquest = new OpenLayers.Layer.OSM('MapQuest','http://otile1.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png',
           {'attribution': '© <a href="http://www.openstreetmap.org/copyright/en" target="_blank">OpenStreetMap</a>' +
              'Contributors<br>Cartography © MapQuest<br>Overlay data licensed under ODbL '}); 
-        this.map.addLayer(mapquest);
-    },
-
-//    createBaseLayers : function() {
-//        var layers = [];
-//        //In verband met de leesbaarheid heb ik MapQuest bovenaan gezet. De kleuren van die kaart zijn wat rustiger 
-//        //waardoor de contrasten met de kleuren van de gebruikte tekens wat groter is.
-//
-//        //Mapquest  - De kaart die bovenstaat in deze lijst is de kaart die default wordt geopend.  
-//        var mapquest = new OpenLayers.Layer.OSM("MapQuest","http://otile1.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
-//          {'attribution': '© <a href="http://www.openstreetmap.org/copyright/en" target="_blank">OpenStreetMap</a>' +
-//             'Contributors<br>Cartography © MapQuest<br>Overlay data licensed under ODbL '}); 
 //        layers.push(mapquest);
 //
 //        //Mapnik
-//        var layerMapnik = new OpenLayers.Layer.OSM.Mapnik("Mapnik",{'attribution': '© <a href="http://www.openstreetmap.org/copyright/en" ' +
-//          'target="_blank">OpenStreetMap</a> Contributors<br>Cartography licensed as CC-BY-SA<br>Overlay data licensed under ODbL '});
+        var layerMapnik = new OpenLayers.Layer.OSM.Mapnik("Mapnik",{'attribution': '© <a href="http://www.openstreetmap.org/copyright/en" ' +
+          'target="_blank">OpenStreetMap</a> Contributors<br>Cartography licensed as CC-BY-SA<br>Overlay data licensed under ODbL '});
 //        layers.push(layerMapnik);
 //        
 //        //Topo
-//        var arcgis = new OpenLayers.Layer.XYZ("ArcGIS World Topo","http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/${z}/${y}/${x}",{'attribution': 'Cartography © <a href="http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer" target="_blank">ArcGIS</a><br>Overlay data OpenStreetMap Contributors, licensed under ODbL '}); 
+        var arcgis = new OpenLayers.Layer.XYZ("ArcGIS World Topo","http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/${z}/${y}/${x}",{'attribution': 'Cartography © <a href="http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer" target="_blank">ArcGIS</a><br>Overlay data OpenStreetMap Contributors, licensed under ODbL '}); 
 //        layers.push(arcgis);
 //     
 //        //Google    
-//        var googlesat = new OpenLayers.Layer.Google("Google Sat",{type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 19});
+        var googlesat = new OpenLayers.Layer.Google("Google Sat",{type: google.maps.MapTypeId.SATELLITE, numZoomLevels: 19});
 //        layers.push(googlesat);
 //
 //        return layers;
-//      },
+        this.map.addLayer(layerMapnik);
+      },
 
     createLayerTreeControl : function(options) {
         this.ls = new osml.LayerTreeControl(this, {

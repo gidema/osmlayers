@@ -75,7 +75,7 @@ osml.FeaturePopup = OpenLayers.Class(OpenLayers.Popup, {
             createMainTab : function() {
                 var widgets = [
                         'osml.widgets.Title',
-                        'osml.widgets.Bustimes',
+                        'osml.widgets.nl.Departures',
                         'osml.widgets.Address',
                         'osml.widgets.Phone',
                         'osml.widgets.Email',
@@ -100,12 +100,12 @@ osml.FeaturePopup = OpenLayers.Class(OpenLayers.Popup, {
                     'osml.widgets.ViewGoogle',
                     'osml.widgets.ViewBing',
                     'osml.widgets.ViewMtM',
-                    'osml.widgets.ViewMapillary'//,
-//                    'osml.widgets.ViewDeHollandseMolen',
-//                    'osml.widgets.ViewMolendatabase',
-//                    'osml.widgets.ViewBagViewer',
-//                    'osml.widgets.ViewOpenKvk',
-//                    'osml.widgets.ViewKvk'
+                    'osml.widgets.ViewMapillary',
+                    'osml.widgets.nl.ViewDeHollandseMolen',
+                    'osml.widgets.nl.ViewMolendatabase',
+                    'osml.widgets.nl.ViewBagViewer',
+                    'osml.widgets.nl.ViewOpenKvk',
+                    'osml.widgets.nl.ViewKvk'
                 ];
                 return new osml.widgets.WidgetGroup(widgets, 'ul');
             },

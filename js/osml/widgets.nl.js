@@ -2,10 +2,13 @@
  * Widgets for the Netherlands
  */
 
+// The namespace
+osml.widgets.nl = osml.widgets.nl || {};
+
 /**
  * Link to bagviewer. A website for viewing Dutch buildings and addresses.
  */
-osml.widgets.ViewBagViewer = OpenLayers.Class(osml.widgets.Widget, {
+osml.widgets.nl.ViewBagViewer = OpenLayers.Class(osml.widgets.Widget, {
     prepare : function(data) {
         this.bagId = data.tags['ref:bag'];
         this.pc = data.tags['addr:postcode'];
@@ -35,46 +38,34 @@ osml.widgets.ViewBagViewer = OpenLayers.Class(osml.widgets.Widget, {
  * Link to Openkvk.nl. A Dutch open-source site for viewing chamber of commerce data.
  * Selection is currently only supported on postcode level. 
  */
-osml.widgets.ViewOpenKvk = function(data) {
-    var postcode = data.tags['addr:postcode'];
-    
-    this.check = function() {
-        if (postcode && postcode.match('^[0-9]{4}[A-Z]{2}$')) {
-            return true;
+osml.widgets.nl.ViewOpenKvk = OpenLayers.Class(osml.widgets.Widget, {
+    prepare : function(data) {
+        this.postcode = data.tags['addr:postcode'];
+        if (this.postcode && this.postcode.match('^[0-9]{4}[A-Z]{2}$')) {
+            var url = 'https://openkvk.nl/zoeken/' + this.postcode;
+            this.setHtml(osml.makeLink(url, 'Open KvK (Chambre of commerce)'));
         }
-    };
-    
-    this.toHtml = function() {
-        var url = 'https://openkvk.nl/zoeken/' + postcode;
-        return osml.makeLink(url, 'Open KvK (Chambre of commerce)');
-    };
-};
+    }
+});
 
 /**
  * Link to the Dutch KvK (Chamber of commerce) site.
  * selection is based on postcode and housenumber
  * 
- * @param data
- * @returns {osml.widgets.ViewKvk}
  */
-osml.widgets.ViewKvk = function(data) {
-    var postcode = data.tags['addr:postcode'];
-    var housenr = data.tags['addr:housenumber'];
-    
-    this.check = function() {
-        if (postcode && postcode.match('^[0-9]{4}[A-Z]{2}$')) {
-            return true;
+osml.widgets.nl.ViewKvk = OpenLayers.Class(osml.widgets.Widget, {
+    prepare : function(data) {
+        this.postcode = data.tags['addr:postcode'];
+        this.housenr = data.tags['addr:housenumber'];
+        if (this.postcode && this.postcode.match('^[0-9]{4}[A-Z]{2}$')) {
+            var params = {
+                q : this.postcode + (this.housenr ? ' ' + this.housenr : '')
+            };
+            var url = osml.formatUrl('http://www.kvk.nl/orderstraat/', params);
+            this.setHtml(osml.makeLink(url, 'KvK (Chambre of commerce)'));
         }
-    };
-    
-    this.toHtml = function() {
-        var params = {
-            q : postcode + (housenr ? ' ' + housenr : '')
-        };
-        var url = osml.formatUrl('http://www.kvk.nl/orderstraat/', params);
-        return osml.makeLink(url, 'KvK (Chambre of commerce)');
-    };
-};
+    }
+});
 
 /**
  * Link to the (wind)mill site 'De hollandse Molen'
@@ -82,46 +73,37 @@ osml.widgets.ViewKvk = function(data) {
  * @param data
  * @returns {osml.widgets.ViewKvk}
  */
-osml.widgets.ViewDeHollandseMolen = function(data) {
-    var dhm_id = data.tags['dhm_id'];
-    
-    this.check = function() {
-        if (dhm_id) {
-            data.usedTags['dhm_id'] = true;
-            return true;
+osml.widgets.nl.ViewDeHollandseMolen = OpenLayers.Class(osml.widgets.Widget, {
+    prepare : function(data) {
+        this.dhm_id = data.tags['dhm_id'];
+        if (this.dhm_id) {
+            this.useTags(data, ['dhm_id']);
+            var params = {
+                v : '1',
+                mid : this.dhm_id,
+                molenid : this.dhm_id
+            };
+            var url = osml.formatUrl('http://www.molens.nl/site/dbase/molen.php', params);
+            this.setHtml(osml.makeLink(url, 'De Hollandsche Molen'));
         }
-    };
-    
-    this.toHtml = function() {
-        var params = {
-            v : '1',
-            mid : dhm_id,
-            molenid : dhm_id
-        };
-        var url = osml.formatUrl('http://www.molens.nl/site/dbase/molen.php', params);
-        return osml.makeLink(url, 'De Hollandsche Molen');
-    };
-};
+    }
+});
 
-osml.widgets.ViewMolendatabase = function(data) {
-    var mdb_id = data.tags['mdb_id'];
-    
-    this.check = function() {
-        if (mdb_id) {
-            data.usedTags['mdb_id'] = true;
-            return true;
+osml.widgets.ViewMolendatabase = OpenLayers.Class(osml.widgets.Widget, {
+    prepare : function(data) {
+        this.mdb_id = data.tags['mdb_id'];
+        if (this.mdb_id) {
+            this.useTags(data, ['mdb_id']);
+            var params = {
+                nummer : this.mdb_id
+            };
+            var url = osml.formatUrl('http://www.molendatabase.nl/nederland/molen.php', params);
+            this.setHtml(osml.makeLink(url, 'Molendatabase'));
         }
-    };
-    
-    this.toHtml = function() {
-        var params = {
-            nummer : mdb_id
-        };
-        var url = osml.formatUrl('http://www.molendatabase.nl/nederland/molen.php', params);
-        return osml.makeLink(url, 'Molendatabase');
-    };
-};
-osml.widgets.Bustimes = OpenLayers.Class(osml.widgets.Widget, {
+    }
+});
+
+osml.widgets.nl.Departures = OpenLayers.Class(osml.widgets.Widget, {
     prepare : function(data) {
         var cxx = data.tags['cxx:code'];
         if (cxx && !isNaN(cxx)) {
