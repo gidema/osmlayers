@@ -89,7 +89,7 @@ osml.widgets.nl.ViewDeHollandseMolen = OpenLayers.Class(osml.widgets.Widget, {
     }
 });
 
-osml.widgets.ViewMolendatabase = OpenLayers.Class(osml.widgets.Widget, {
+osml.widgets.nl.ViewMolendatabase = OpenLayers.Class(osml.widgets.Widget, {
     prepare : function(data) {
         this.mdb_id = data.tags['mdb_id'];
         if (this.mdb_id) {

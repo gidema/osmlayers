@@ -53,27 +53,6 @@ osml.LayerDef = OpenLayers.Class({
     }
 
 });
-
-osml.LayerGroup = OpenLayers.Class({
-    id : null,
-    name : null,
-    layers : null,
-
-    initialize : function(site, id, name, layerIds) {
-        this.id = id;
-        this.name = name;
-        this.layers = [];
-        layerIds.forEach(function(id) {
-            var layer = site.layers[id];
-            if (layer) {
-                this.layers.push(layer);
-            } else {
-                alert('Unknown layer: ' + id);
-            }
-        }, this);
-    }
-});
-
 /**
  * Utility functions
  */

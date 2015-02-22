@@ -10,8 +10,7 @@ $(document).ready(function() {
             div : 'osmlLayerSelector'
         },
         layerData : layerData,
-        treeData : treeData,
-        layerGroups : layerGroups
+        treeData : treeData
     });
 });
 
@@ -246,8 +245,8 @@ var layerData = {
         query : 'shop=mall',
         icon : 'mall.png'
     },
-    osmShop : {
-        name : 'General',
+    osmOtherShop : {
+        name : 'Other shop',
         query : 'shop=general',
         icon : 'letter_s.png'
     },
@@ -487,7 +486,7 @@ var layerData = {
         icon : 'windmill-2.png'
     },
     osmWatermill : {
-        name : 'Water',
+        name : 'Watermill',
         query : 'man_made=watermill',
         icon : 'watermill-2.png'
     }
@@ -496,45 +495,60 @@ var layerData = {
 var treeData = {
     facilities : {
         name : 'Facilities',
-        childeren : {
+        children : {
             transport : {
                 name : 'Transport',
-                layers : [ 'osmFuel', 'osmBicycleparking', 'osmBicyclerental',
+                layers : [ 'osmBusstop', 'osmFuel', 'osmBicycleparking', 'osmBicyclerental',
                         'osmTaxi', 'osmParking' ]
             },
             education : {
                 name : 'Education',
                 layers : [ 'osmSchool', 'osmUniversity' ]
             },
-            culture : {
-                name : 'Culture',
-                layers : [ 'osmArtscentre', 'osmTheatre', 'osmCinema',
-                        'osmMuseum', 'osmArtwork', 'osmGallery' ]
+            publicFacilities : {
+                name : 'Public',
+                layers : ['osmPostbox', 'osmPostoffice', 'osmPharmacy',
+                        'osmToilets', 'osmPolice', 'osmATM' ]
             },
-            tourism : {
-                name : 'Tourism',
-                layers : [ 'osmInformation', 'osmPicnic', 'osmZoo',
-                        'osmViewpoint', 'osmAttraction' ]
+            health : {
+                name : 'Health',
+                layers : ['osmPharmacy']
             },
-            accomodation : {
-                name : 'Accomodation',
-                layers : [ 'osmHotel', 'osmApartment', 'osmGuesthouse',
-                        'osmHostel', 'osmMotel', 'osmCampsite',
-                        'osmCampsiteCountry' ]
+            leisure : {
+                name : 'Leisure',
+                layers : [ 'osmBench']
             },
-            facilities : {
+            emergency : {
+                name: 'Emergency',
+                layers : ['osmDefibrilator', 'osmFirehose']
+            },
+           facilities : {
                 name : 'Food',
                 layers : [ 'osmRestaurant', 'osmBar', 'osmCafe', 'osmPub',
                         'osmIcecream', 'osmFastfood' ]
             }
         }
     },
-    sport : {
-        name : 'Sport',
-        layers : [ 'osmSoccer', 'osmUsFootball', 'osmGolf', 'osmTennis',
-                'osmVolleybal', 'osmBaseball', 'osmBasketball', 'osmIcehockey',
-                'osmHockey', 'osmCycling', 'osmHorseracing', 'osmSwimming',
-                'osmSurfing', 'osmGymnastics' ]
+    tourism : {
+        name : 'Tourism',
+        layers : ['osmInformation'],
+        children : {
+            attraction : {
+                name : 'Attraction',
+                layers : [ 'osmZoo', 'osmViewpoint', 'osmMemorial', 'osmMonument', 'osmWindmill',
+                           'osmWatermill', 'osmPicnic', 'osmAttraction' ]
+            },
+            culture : {
+                name : 'Culture',
+                layers : [ 'osmArtscentre', 'osmTheatre', 'osmCinema',
+                        'osmMuseum', 'osmArtwork', 'osmGallery' ]
+            },
+            accomodation : {
+                name : 'Accomodation',
+                layers : [ 'osmHotel', 'osmApartment', 'osmGuesthouse',
+                        'osmHostel', 'osmMotel', 'osmCampsite']
+            }
+        }
     },
     shopping : {
         name : 'Shopping',
@@ -549,77 +563,20 @@ var treeData = {
             },
             other : {
                 name : 'Other shops',
-                layers : [ 'osmMall', 'osmGeneral', 'osmDepartmentstore',
+                layers : [ 'osmMall', 'osmOtherShop', 'osmDepartmentstore',
                         'osmClothes', 'osmFashion', 'osmJewelry', 'osmLeather',
                         'osmShoes', 'osmHairdresser', 'osmBeauty',
                         'osmCosmetics', 'osmChemist', 'osmOpticien',
                         'osmBooks', 'osmPhoto', 'osmToys', 'osmGift',
-                        'osmBicycle', 'osmMusicalinstruments' ]
+                        'osmBicycle', 'osmMusicalinstruments', 'osmTravelagency', 'osmCopyshop' ]
             }
         }
     },
-    various : {
-        name : 'Various',
-        layers : [ 'osmTravelagency', 'osmCopyshop', 'osmDefibrilator',
-                'osmFirehose', 'osmMemorial', 'osmMonument', 'osmWindmill' ]
-    },
-    amenity : {
-        name : 'Amenity',
-        layers : [ 'osmBench', 'osmPostbox', 'osmPostoffice', 'osmPharmacy',
-                'osmToilets', 'osmPolice', 'osmATM' ]
-    }
-};
-
-/**
- * Old style 2 level layerGroups.
- * 
- */
-var layerGroups = {
-    osmgAmenity : {
-        name : 'Amenity',
-        layers : [ 'osmBench', 'osmPostbox', 'osmPostoffice', 'osmPharmacy',
-                'osmToilets', 'osmPolice', 'osmATM', 'osmFuel', 'osmSchool',
-                'osmUniversity', 'osmBicycleparking', 'osmBicyclerental',
-                'osmTaxi', 'osmParking', 'osmArtscentre', 'osmTheatre',
-                'osmCinema' ]
-    },
-    osmgTourism : {
-        name : 'Tourism',
-        layers : [ 'osmInformation', 'osmMuseum', 'osmArtwork', 'osmGallery',
-                'osmPicnic', 'osmZoo', 'osmViewpoint', 'osmAttraction',
-                'osmHotel', 'osmApartment', 'osmGuesthouse', 'osmHostel',
-                'osmMotel', 'osmCampsite' ]
-    },
-    osmgSport : {
+    sport : {
         name : 'Sport',
         layers : [ 'osmSoccer', 'osmUsFootball', 'osmGolf', 'osmTennis',
                 'osmVolleybal', 'osmBaseball', 'osmBasketball', 'osmIcehockey',
                 'osmHockey', 'osmCycling', 'osmHorseracing', 'osmSwimming',
                 'osmSurfing', 'osmGymnastics' ]
-    },
-    osmgShop : {
-        name : 'Shopping',
-        layers : [ 'osmSupermarket', 'osmMall', 'osmShop',
-                'osmDepartmentstore', 'osmClothes', 'osmFashion', 'osmJewelry',
-                'osmLeather', 'osmShoes', 'osmHairdresser', 'osmBeauty',
-                'osmCosmetics', 'osmChemist', 'osmOpticien', 'osmBooks',
-                'osmPhoto', 'osmToys', 'osmGift', 'osmBicycle',
-                'osmMusicalinstruments' ]
-    },
-    osmgFood : {
-        name : 'Food',
-        layers : [ 'osmRestaurant', 'osmBar', 'osmCafe', 'osmPub',
-                'osmIcecream', 'osmFastfood', 'osmSupermarket', 'osmBakery',
-                'osmConfectionery', 'osmDeli', 'osmDairy', 'osmCheese',
-                'osmGreengrocer', 'osmGrocery', 'osmButcher', 'osmCoffee',
-                'osmSeafood', 'osmOrganic', 'osmDrinkingwater', 'osmAlcohol',
-                'osmWine', 'osmBeverages' ]
-    },
-    osmgVarious : {
-        name : 'Various',
-
-        layers : [ 'osmBusstop', 'osmTravelagency', 'osmCopyshop',
-                'osmDefibrilator', 'osmFirehose', 'osmMemorial', 'osmMonument',
-                'osmWindmill', 'osmWatermill' ]
     }
 };

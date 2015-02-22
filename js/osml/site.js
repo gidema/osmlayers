@@ -9,34 +9,19 @@ osml.Site = OpenLayers.Class({
     statusDiv : 'statusline',
     map : null,
     layers : {},
-    layerTree : {},
-    layerGroups : {}, // Old style 2 level layer groups
+    layerTree : null,
 
     initialize : function(options) {
         this.statusDiv = options.statusDiv ? options.statusDiv : 'statusline';
         var mapOptions = options.map;
-        // Initialize old style 2 level layers
-        this.initializeLayers(options.layerData, options.layerGroups);
+        this.layerTree = new osml.LayerTree(options.layerData, options.treeData);
         this.createMap(mapOptions);
-//    this.createOsmLayers(options.layerData);
 //    var layerTreeControlOptions = options.layerTreeControl;
 //    if (layerTreeControlOptions) {
 //        this.createLayerTreeControl(layerTreeControlOptions);
 //    }
     },
 
-    initializeLayers : function(layerData, layerGroups) {
-        var self = this;
-        $.each(layerData, function(id, l) {
-            var layerDef = new osml.LayerDef(id, l.name, l.query, l.icon);
-            var layer = new osml.OverpassLayer(layerDef);
-            self.layers[id] = layer;
-        });
-        $.each(layerGroups, function(id, g) {
-            var group = new osml.LayerGroup(self, g.id, g.name, g.layers);
-            self.layerGroups[id] = group;
-        });
-    },
     createMap : function(options) {
         var self = this;
         this.map = new OpenLayers.Map ('map', {
@@ -69,9 +54,8 @@ osml.Site = OpenLayers.Class({
         },
 
         // The layer switcher
-        this.ls = new osml.LayerTreeSwitcher(this, {
+        this.ls = new osml.LayerTreeControl(this.layerTree, {
           div: document.getElementById('osmlLayerSelector'),
-          layerGroups: this.layerGroups
         });
         //this.ls.maximizeControl();
         map.addControl(this.ls);
@@ -89,7 +73,7 @@ osml.Site = OpenLayers.Class({
         this.createBaseLayers();
         
         // The other layers
-        $.each(this.layers, function(id, layer) {
+        $.each(this.layerTree.layers, function(id, layer) {
             map.addLayer(layer);
         });
 
@@ -112,7 +96,7 @@ osml.Site = OpenLayers.Class({
 //        layers.push(mapquest);
 //
 //        //Mapnik
-        var layerMapnik = new OpenLayers.Layer.OSM.Mapnik("Mapnik",{'attribution': '© <a href="http://www.openstreetmap.org/copyright/en" ' +
+        var mapnik = new OpenLayers.Layer.OSM.Mapnik("Mapnik",{'attribution': '© <a href="http://www.openstreetmap.org/copyright/en" ' +
           'target="_blank">OpenStreetMap</a> Contributors<br>Cartography licensed as CC-BY-SA<br>Overlay data licensed under ODbL '});
 //        layers.push(layerMapnik);
 //        
@@ -125,25 +109,8 @@ osml.Site = OpenLayers.Class({
 //        layers.push(googlesat);
 //
 //        return layers;
-        this.map.addLayer(layerMapnik);
+        this.map.addLayer(mapquest);
       },
-
-    createLayerTreeControl : function(options) {
-        this.ls = new osml.LayerTreeControl(this, {
-            div : options.div,
-            layerGroups : this.layerGroups
-        });
-        // this.ls.maximizeControl();
-        map.addControl(this.ls);
-    },
-    
-    getLayer : function(id) {
-        return this.layers[id];
-    },
-    
-    getGroup : function(id) {
-        return this.layerGroups[id];
-    },
     zoomValid: function() {
         return this.map.getZoom() > this.zoom_data_limit;
     },
@@ -157,9 +124,6 @@ osml.Site = OpenLayers.Class({
     setStatusText: function(text) {
         var element = document.getElementById(this.statusDiv);
         if (element != null) {
-            //var div = html_node.firstChild;
-            //div.deleteData(0, div.nodeValue.length);
-            //div.appendData(text);
             element.innerHTML = text;
             if (text != "") {
                 element.style.visibility = "visible";
