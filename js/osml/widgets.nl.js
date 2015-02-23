@@ -157,7 +157,7 @@ osml.widgets.nl.Departures = OpenLayers.Class(osml.widgets.Widget, {
             timeTable.push({
                 destination : pass.DestinationName50,
                 lineNumber : pass.LinePublicNumber,
-                departure : new Date(pass.ExpectedDepartureTime)
+                departure : new Date(pass.ExpectedDepartureTime + '+0100')
             });
         };
         // Sort the timeTable

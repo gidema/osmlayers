@@ -358,6 +358,43 @@ osml.widgets.EditOnline = OpenLayers.Class(osml.widgets.Widget, {
     }
 });
 
+osml.widgets.Directions = OpenLayers.Class(osml.widgets.Widget, {
+    prepare : function(data) {
+        this.lonTo = data.lon;
+        this.latTo = data.lat;
+        this.setActive();
+    },
+    render : function(parent) {
+        var doc = parent.ownerDocument;
+        var a = doc.createElement('a');
+        a.setAttribute('href', '#');
+        a.innerHTML = 'Get directions';
+        parent.appendChild(a);
+        $(a).on('click', this, this.onclick);
+    },
+    onclick : function(e, data) {
+        var url = osml.formatString('http://www.openstreetmap.org/directions?engine=osrm_car&route=;{0},{1}',
+            this.latTo, this.lonTo);
+    window.open(url);
+//    var self = e.data;
+//    navigator.geolocation.getCurrentPosition(function (position) {
+//        self.getDirections(position.coords);
+//    });
+    },
+    callback : function(result) {
+        if (typeof result == 'Position') {
+            var latFrom = result.coords.lattitude;
+            var lonFrom = result.coords.longitude;
+            var url = osml.formatString('http://www.openstreetmap.org/directions?engine=osrm_car&route={0},{1};{2},{3}',
+                latFrom, lonFrom, this.latTo, this.lonTo);
+        }
+        else {
+            var x = 4;
+        };
+    },
+    
+});
+
 osml.widgets.TabPane = OpenLayers.Class(osml.widgets.Widget, {
     initialize : function(tabData) {
         this.tabs = [];

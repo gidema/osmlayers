@@ -5,7 +5,7 @@
  */
 osml.Site = OpenLayers.Class({
     zoom_data_limit : 12,
-    ls : null,
+    ltc : null,
     statusDiv : 'statusline',
     map : null,
     layers : {},
@@ -16,10 +16,10 @@ osml.Site = OpenLayers.Class({
         var mapOptions = options.map;
         this.layerTree = new osml.LayerTree(options.layerData, options.treeData);
         this.createMap(mapOptions);
-//    var layerTreeControlOptions = options.layerTreeControl;
-//    if (layerTreeControlOptions) {
-//        this.createLayerTreeControl(layerTreeControlOptions);
-//    }
+        var layerTreeControlOptions = options.layerTreeControl;
+        if (layerTreeControlOptions) {
+            this.createLayerTreeControl(layerTreeControlOptions);
+        }
     },
 
     createMap : function(options) {
@@ -53,13 +53,6 @@ osml.Site = OpenLayers.Class({
             Control: 2000
         },
 
-        // The layer switcher
-        this.ls = new osml.LayerTreeControl(this.layerTree, {
-          div: document.getElementById('osmlLayerSelector'),
-        });
-        //this.ls.maximizeControl();
-        map.addControl(this.ls);
-        
         // De Zoekbox
         map.addControl (new OpenLayers.Control.SearchBox({
           div: document.getElementById('osmlSearchBox'),
@@ -80,6 +73,15 @@ osml.Site = OpenLayers.Class({
         if(!map.getCenter()) {
           map.setCenter(new OpenLayers.LonLat(options.lon, options.lat).transform(map.displayProjection, map.projection), options.zoom);
         };
+    },
+    createLayerTreeControl : function(options) {
+        // The layer tree control
+        var div = document.getElementById(options.div);
+        this.ltc = new osml.LayerTreeControl(this.layerTree, {
+            div: div
+        });
+        this.map.addControl(this.ltc);
+        div.style.height = this.map.div.clientHeight;
     },
 
     /*

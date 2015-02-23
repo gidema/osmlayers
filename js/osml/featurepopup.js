@@ -83,7 +83,8 @@ osml.FeaturePopup = OpenLayers.Class(OpenLayers.Popup, {
                         new Array('osml.widgets.Website', 'url'),
                         'osml.widgets.Twitter',
                         'osml.widgets.Facebook',
-                        'osml.widgets.Wikipedia'
+                        'osml.widgets.Wikipedia',
+                        'osml.widgets.Directions'
                     ];
                 return new osml.widgets.WidgetGroup(widgets, 'plain');
             },
