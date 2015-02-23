@@ -373,8 +373,9 @@ osml.widgets.Directions = OpenLayers.Class(osml.widgets.Widget, {
         $(a).on('click', this, this.onclick);
     },
     onclick : function(e, data) {
+        var self = e.data;
         var url = osml.formatString('http://www.openstreetmap.org/directions?engine=osrm_car&route=;{0},{1}',
-            this.latTo, this.lonTo);
+            self.latTo, self.lonTo);
     window.open(url);
 //    var self = e.data;
 //    navigator.geolocation.getCurrentPosition(function (position) {
